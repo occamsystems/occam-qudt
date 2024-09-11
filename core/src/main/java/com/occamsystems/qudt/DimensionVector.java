@@ -104,7 +104,7 @@ public class DimensionVector {
     return Arrays.hashCode(vector);
   }
 
-  private static class Builder {
+  public static class Builder {
     private SmallFraction amountOfSubstance = SmallFraction.ZERO;
     private SmallFraction electricCurrent = SmallFraction.ZERO;
     private SmallFraction length = SmallFraction.ZERO;

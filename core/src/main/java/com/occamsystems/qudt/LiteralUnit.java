@@ -13,6 +13,17 @@ public class LiteralUnit extends Unit {
   private double conversionOffset;
   private double conversionMultiplier;
 
+  public LiteralUnit(String label, String uri, String symbol, String ucumCode, DimensionVector dv,
+      double conversionOffset, double conversionMultiplier) {
+    this.label = label;
+    this.uri = uri;
+    this.symbol = symbol;
+    this.ucumCode = ucumCode;
+    this.dv = dv;
+    this.conversionOffset = conversionOffset;
+    this.conversionMultiplier = conversionMultiplier;
+  }
+
   public String uri() {
     return this.uri;
   }
@@ -47,7 +58,8 @@ public class LiteralUnit extends Unit {
     return this.conversionOffset;
   }
 
-  public static final LiteralUnit UNITLESS = new LiteralUnit() {
+  public static final DimensionVector DIMENSION_VECTOR = DimensionVector.builder().build();
+  public static final Unit UNITLESS = new Unit() {
     @Override
     public String label() {
       return "Unitless";
@@ -65,7 +77,7 @@ public class LiteralUnit extends Unit {
 
     @Override
     public DimensionVector dv() {
-      return DimensionVector.DIMENSIONLESS;
+      return DIMENSION_VECTOR;
     }
 
     @Override

@@ -31,7 +31,6 @@ public class GenerateDimensionVectors {
     Model model = ModelFactory.createDefaultModel();
     model.read(VECTOR_VOCAB, "TTL");
 
-    Property definedBy = model.createProperty(DEFINED_BY);
     Property massExp = model.createProperty(MASS_EXPONENT);
 
     ResIterator iterator = model.listSubjectsWithProperty(massExp);
@@ -42,7 +41,6 @@ public class GenerateDimensionVectors {
       String localName = res.getLocalName();
       String regex = "[AELIMHTD]";
       String[] split = localName.split(regex);
-      StringBuilder name = new StringBuilder();
       int[] array = new int[16];
       if (split.length >= 9) {
         for (int i = 0; i < 8; i++) {
@@ -63,20 +61,11 @@ public class GenerateDimensionVectors {
             array[2 * i] = val;
             array[2 * i + 1] = 1;
           }
-          if (val != 0 || fracSplit.length > 1) {
-            name.append(regex.charAt(i + 1)).append(expStr);
-          }
         }
 
-
-        String finalName = name.toString().replace("-", "_");
-        if (finalName.isBlank()) {
-          log.warning("Blank dimension vector name for " + localName);
-          vectors.put(localName, Arrays.toString(array));
-        } else {
-          vectors.put(finalName,
-              Arrays.toString(array));
-        }
+        vectors.put(localName.replace("-","_")
+                .replace("pt","dot"),
+            Arrays.toString(array));
       } else {
         log.warning("Unable to parse dimension vector " + localName);
         vectors.put(localName, "[0,0,0 ,0,0,0,0,0]");
