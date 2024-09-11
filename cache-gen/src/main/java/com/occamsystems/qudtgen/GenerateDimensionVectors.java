@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
@@ -35,23 +36,30 @@ public class GenerateDimensionVectors {
 
     ResIterator iterator = model.listSubjectsWithProperty(massExp);
 
-    Map<String, String> vectors = new HashMap<>(300);
+    Map<String, String> vectors = new TreeMap<>();
 
     iterator.forEach(res -> {
       String localName = res.getLocalName();
       String regex = "[AELIMHTD]";
       String[] split = localName.split(regex);
       StringBuilder name = new StringBuilder();
-      int[] array = new int[14];
-      if (split.length >= 7) {
-        for (int i = 0; i < 7; i++) {
+      int[] array = new int[16];
+      if (split.length >= 9) {
+        for (int i = 0; i < 8; i++) {
           String expStr = split[i + 1];
+          int dot = expStr.indexOf("dot");
+          int pt = expStr.indexOf("pt");
           String[] fracSplit = expStr.split("[(dot)(pt)]");
           int val = fracSplit[0].isBlank() ? 0 : Integer.parseInt(fracSplit[0]);
-          if (fracSplit.length > 1) {
-            array[2 * i] = val * 2 + (fracSplit[0].charAt(0) == '-' ? -1 : 1);
+          if (dot >= 0 || pt >= 0) {
+            if (fracSplit.length > 1) {
+              array[2 * i] = val * 2 + (fracSplit[0].charAt(0) == '-' ? -1 : 1);
+            } else {
+              array[2 * i] = 1;
+            }
+            val = 1; //This helps with correct name generation.
             array[2 * i + 1] = 2;
-          } else {
+          }else {
             array[2 * i] = val;
             array[2 * i + 1] = 1;
           }
@@ -60,19 +68,18 @@ public class GenerateDimensionVectors {
           }
         }
 
-        if (!split[8].equals("0")) {
-          name.append('D').append(split[8]);
-        }
 
         String finalName = name.toString().replace("-", "_");
         if (finalName.isBlank()) {
           log.warning("Blank dimension vector name for " + localName);
+          vectors.put(localName, Arrays.toString(array));
         } else {
           vectors.put(finalName,
               Arrays.toString(array));
         }
       } else {
-        log.warning("Unable to process dimension vector " + localName);
+        log.warning("Unable to parse dimension vector " + localName);
+        vectors.put(localName, "[0,0,0 ,0,0,0,0,0]");
       }
     });
 

@@ -1,12 +1,14 @@
 package com.occamsystems.qudt;
 
+import java.util.Arrays;
+
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
  */
 public class DimensionVector {
 
   public static final DimensionVector DIMENSIONLESS = DimensionVector.builder().build();
-  private final SmallFraction[] vector = new SmallFraction[7];
+  private final SmallFraction[] vector = new SmallFraction[8];
   public static final int amountOfSubstance = 0;
   public static final int electricCurrent = 1;
   public static final int length = 2;
@@ -14,21 +16,22 @@ public class DimensionVector {
   public static final int mass = 4;
   public static final int thermodynamicTemperature = 5;
   public static final int time = 6;
+  public static final int dimensionless = 7;
 
   public static Builder builder() {
     return new Builder();
   }
 
   public DimensionVector(int[] numDenomArray) {
-    if (numDenomArray.length != 7 && numDenomArray.length != 14) {
+    if (numDenomArray.length != 8 && numDenomArray.length != 16) {
       throw new IllegalArgumentException("Dimension vector int[] constructor must have length "
-          + "7 for simple int values or "
-          + "14 for fractional values.");
+          + "8 for simple int values or "
+          + "16 for fractional values.");
     }
 
-    boolean hasDenoms = numDenomArray.length == 14;
+    boolean hasDenoms = numDenomArray.length == 16;
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
       if (hasDenoms) {
         this.vector[i] = new SmallFraction(numDenomArray[2 * i], numDenomArray[2 * i + 1]);
       } else {
@@ -43,7 +46,7 @@ public class DimensionVector {
     }
   }
 
-  public boolean dimensionless() {
+  public boolean empty() {
     for (int i = 0; i < vector.length; i++) {
       if (!vector[i].isZero()) {
         return false;
@@ -69,7 +72,7 @@ public class DimensionVector {
   }
 
   public DimensionVector scaledBy(SmallFraction value) {
-    SmallFraction[] scaled = new SmallFraction[7];
+    SmallFraction[] scaled = new SmallFraction[8];
     for (int i = 0; i < this.vector.length; i++) {
         scaled[i] = SmallFraction.times(this.vector[i], value);
     }
@@ -84,6 +87,23 @@ public class DimensionVector {
     return new DimensionVector(scaled);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DimensionVector that = (DimensionVector) o;
+    return Arrays.equals(vector, that.vector);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(vector);
+  }
+
   private static class Builder {
     private SmallFraction amountOfSubstance = SmallFraction.ZERO;
     private SmallFraction electricCurrent = SmallFraction.ZERO;
@@ -92,6 +112,7 @@ public class DimensionVector {
     private SmallFraction mass = SmallFraction.ZERO;
     private SmallFraction thermodynamicTemperature = SmallFraction.ZERO;
     private SmallFraction time = SmallFraction.ZERO;
+    private SmallFraction dimensionless = SmallFraction.ZERO;
 
     public Builder withAmountOfSubstance(SmallFraction amountOfSubstance) {
       this.amountOfSubstance = amountOfSubstance;
@@ -128,6 +149,11 @@ public class DimensionVector {
       return this;
     }
 
+    public Builder withDimensionless(SmallFraction dimensionless) {
+      this.dimensionless = dimensionless;
+      return this;
+    }
+
     public DimensionVector build() {
       return new DimensionVector(new SmallFraction[]{this.amountOfSubstance,
       this.electricCurrent,
@@ -135,7 +161,8 @@ public class DimensionVector {
       this.luminousIntensity,
       this.mass,
       this.thermodynamicTemperature,
-      this.time});
+      this.time,
+      this.dimensionless});
     }
   }
 }

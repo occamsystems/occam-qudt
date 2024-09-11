@@ -117,12 +117,12 @@ public class SmallFraction extends Number {
       return false;
     }
     SmallFraction that = (SmallFraction) o;
-    return num == that.num && denom == that.denom;
+    return doubleValue() == that.doubleValue();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(num, denom);
+    return Objects.hash(doubleValue());
   }
 
   @Override
