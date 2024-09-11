@@ -1,9 +1,9 @@
-package qudt;
+package com.occamsystems.qudt;
 
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
  */
-public class LiteralUnit implements Unit {
+public class LiteralUnit extends Unit {
 
   private String label;
   private String uri;

@@ -1,4 +1,4 @@
-package qudt;
+package com.occamsystems.qudt;
 
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
@@ -17,6 +17,24 @@ public class DimensionVector {
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public DimensionVector(int[] numDenomArray) {
+    if (numDenomArray.length != 7 && numDenomArray.length != 14) {
+      throw new IllegalArgumentException("Dimension vector int[] constructor must have length "
+          + "7 for simple int values or "
+          + "14 for fractional values.");
+    }
+
+    boolean hasDenoms = numDenomArray.length == 14;
+
+    for (int i = 0; i < 7; i++) {
+      if (hasDenoms) {
+        this.vector[i] = new SmallFraction(numDenomArray[2 * i], numDenomArray[2 * i + 1]);
+      } else {
+        this.vector[i] = new SmallFraction(numDenomArray[i]);
+      }
+    }
   }
 
   public DimensionVector(SmallFraction[] smallFractions) {

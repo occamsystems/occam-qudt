@@ -1,4 +1,4 @@
-package qudt;
+package com.occamsystems.qudt;
 
 import java.util.Objects;
 

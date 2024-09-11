@@ -1,6 +1,4 @@
-package qudt;
-
-import static qudt.DimensionVector.DIMENSIONLESS;
+package com.occamsystems.qudt;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.Map.Entry;
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
  */
-public class AggregateUnit implements Unit{
+public class AggregateUnit extends Unit{
   Map<LiteralUnit, SmallFraction> components;
 
   public AggregateUnit(Unit unit, int i) {
@@ -75,7 +73,7 @@ public class AggregateUnit implements Unit{
     return this.components.entrySet()
         .stream()
         .map(entry -> entry.getKey().dv().scaledBy(entry.getValue()))
-        .reduce(DIMENSIONLESS, DimensionVector::add);
+        .reduce(DimensionVector.DIMENSIONLESS, DimensionVector::add);
   }
 
   @Override
