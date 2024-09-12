@@ -34,4 +34,28 @@ public class GeneratorUtils {
   public static String toConstName(String base) {
     return base.replaceAll("([a-z\\d])([A-Z])", "$1_$2").replace("-","_").toUpperCase();
   }
+
+  public static String shortenVectorName(String longName) {
+    String regex = "[AELIMHTD]";
+    String[] split = longName.split(regex);
+
+    if (split.length != 9) {
+      return longName;
+    }
+
+    StringBuilder b = new StringBuilder();
+    for (int i = 0; i < split.length; i++) {
+      if (!split[i].isBlank() && !"0".equals(split[i])) {
+        b.append(regex.charAt(i)).append(split[i]
+            .replace("-","_")
+            .replace("pt", "dot"));
+      }
+    }
+
+    if (b.isEmpty()) {
+      return longName;
+    } else {
+      return b.toString();
+    }
+  }
 }

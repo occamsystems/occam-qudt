@@ -1,5 +1,8 @@
 package com.occamsystems.qudtgen;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,8 +12,10 @@ import org.junit.jupiter.api.Test;
 class GenerateUnitsTest {
 
   @Test
-  void run() {
+  void run() throws IOException {
     GenerateUnits gen = new GenerateUnits();
-    Assertions.assertDoesNotThrow(() -> gen.run("./testUnits.java"));
+    Path tempDirectory = Files.createTempDirectory("test-temp");
+    tempDirectory.toFile().deleteOnExit();
+    Assertions.assertDoesNotThrow(() -> gen.run(tempDirectory.toString()));
   }
 }

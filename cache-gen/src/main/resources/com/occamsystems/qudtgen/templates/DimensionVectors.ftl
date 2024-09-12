@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class DimensionVectors {
 <#list vectors as name, array>
-  public static final DimensionVector ${name} = new DimensionVector(${array});
+  public static final DimensionVector ${name} = new DimensionVector(new int[]${array});
 </#list>
 
   public static final List<DimensionVector> PREDEFINED = List.of(

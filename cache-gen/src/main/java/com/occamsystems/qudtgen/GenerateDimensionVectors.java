@@ -4,6 +4,7 @@ import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,12 +64,11 @@ public class GenerateDimensionVectors {
           }
         }
 
-        vectors.put(localName.replace("-","_")
-                .replace("pt","dot"),
-            Arrays.toString(array));
+        vectors.put(GeneratorUtils.shortenVectorName(localName),
+            Arrays.toString(array).replace('[','{').replace(']','}'));
       } else {
         log.warning("Unable to parse dimension vector " + localName);
-        vectors.put(localName, "[0,0,0 ,0,0,0,0,0]");
+        vectors.put(localName, "{0,0,0,0,0,0,0,0}");
       }
     });
 
@@ -76,11 +76,13 @@ public class GenerateDimensionVectors {
     freemarker.setClassForTemplateLoading(this.getClass(), "templates");
     try {
       Template template = freemarker.getTemplate("DimensionVectors.ftl");
+      File outDir = new File(outputFilePath);
+      boolean ok = outDir.exists() || outDir.mkdirs();
       Environment env = template.createProcessingEnvironment(Map.of(
           "vocabUrl", VECTOR_VOCAB,
           "vectors", vectors,
               "names", vectors.keySet().stream().collect(Collectors.joining(",\n\t\t"))),
-          Files.newBufferedWriter(Path.of(outputFilePath)));
+          Files.newBufferedWriter(Path.of(outputFilePath, "DimensionVectors.java")));
       env.process();
     } catch (IOException | TemplateException e) {
       throw new RuntimeException(e);

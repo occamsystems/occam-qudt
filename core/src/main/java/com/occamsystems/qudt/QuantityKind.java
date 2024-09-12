@@ -18,4 +18,12 @@ public class QuantityKind {
     this.dimensionVector = dimensionVector;
     this.broaderKinds = broaderKinds;
   }
+
+  public String uri() {
+    if (this.uri.startsWith("http")) {
+      return this.uri;
+    } else {
+      return "http://qudt.org/vocab/unit/" + this.uri;
+    }
+  }
 }

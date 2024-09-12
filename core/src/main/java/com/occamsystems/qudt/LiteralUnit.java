@@ -25,7 +25,11 @@ public class LiteralUnit extends Unit {
   }
 
   public String uri() {
-    return this.uri;
+    if (this.uri.startsWith("http")) {
+      return this.uri;
+    } else {
+      return "http://qudt.org/vocab/unit/" + this.uri;
+    }
   }
 
   @Override

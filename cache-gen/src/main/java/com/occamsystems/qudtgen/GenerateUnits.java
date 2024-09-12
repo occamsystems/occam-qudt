@@ -4,9 +4,11 @@ import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -38,19 +40,19 @@ public class GenerateUnits {
 
     ResIterator iterator = model.listSubjectsWithProperty(hasVector);
 
-    Map<String, String> units = new TreeMap<>();
+    Map<String, Map<String, String>> vectorToUnits = new HashMap<>(300);
 
     iterator.forEach(res -> {
       String localName = res.getLocalName();
-      String vectorName = res.getProperty(hasVector).getObject().asResource().getLocalName()
-          .replace("-","_")
-          .replace("pt","dot");
+      String vectorName = GeneratorUtils.shortenVectorName(res.getProperty(hasVector).getObject().asResource().getLocalName());
+      Map<String, String> units = vectorToUnits.computeIfAbsent(vectorName,
+          n -> new TreeMap<>());
       String args = "\"%s\",\"%s\",\"%s\",\"%s\",%s,%s,%s".formatted(
         GeneratorUtils.bestString(res, label),
-        res.getURI(),
+        res.getLocalName(),
           GeneratorUtils.bestString(res, symbol),
           GeneratorUtils.bestString(res, ucumCode),
-          "DimensionVectors." + vectorName,
+          vectorName,
           String.valueOf(GeneratorUtils.doubleOrElse(res, conversionOffset, 0.)),
           String.valueOf(GeneratorUtils.doubleOrElse(res, conversionMult, 1.))
       );
@@ -64,13 +66,24 @@ public class GenerateUnits {
     freemarker.setClassForTemplateLoading(this.getClass(), "templates");
     try {
       Template template = freemarker.getTemplate("Units.ftl");
-      Environment env = template.createProcessingEnvironment(Map.of(
-              "vocabUrl", UNIT_VOCAB,
-              "units", units,
-              "names", units.keySet().stream().collect(Collectors.joining(",\n\t\t"))),
-          Files.newBufferedWriter(Path.of(outputFilePath)));
-      env.process();
-    } catch (IOException | TemplateException e) {
+      String oPath = Path.of(outputFilePath, "units").toString();
+      File outDir = new File(oPath);
+      boolean ok = outDir.exists() || outDir.mkdirs();
+      vectorToUnits.forEach((vector, units) -> {
+        Environment env = null;
+        try {
+          env = template.createProcessingEnvironment(Map.of(
+                  "vocabUrl", UNIT_VOCAB,
+                      "vector", vector,
+                  "units", units,
+                  "names", units.keySet().stream().collect(Collectors.joining(",\n\t\t"))),
+          Files.newBufferedWriter(Path.of(oPath, vector+"Units.java")));
+          env.process();
+        } catch (TemplateException | IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
