@@ -1,5 +1,6 @@
 package com.occamsystems.qudt;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 
 /**
@@ -8,6 +9,14 @@ import java.util.Arrays;
 public class DimensionVector {
 
   public static final DimensionVector DIMENSIONLESS = DimensionVector.builder().build();
+  public static final String NOT_APPLICABLE = "NotApplicable";
+  public static final NumberFormat NF;
+
+  static {
+    NF = NumberFormat.getNumberInstance();
+    NF.setMaximumFractionDigits(2);
+    NF.setMinimumFractionDigits(0);
+  }
   private final SmallFraction[] vector = new SmallFraction[8];
   public static final int amountOfSubstance = 0;
   public static final int electricCurrent = 1;
@@ -17,6 +26,8 @@ public class DimensionVector {
   public static final int thermodynamicTemperature = 5;
   public static final int time = 6;
   public static final int dimensionless = 7;
+
+  private static final char[] dimesionChars = "AELIMHTD".toCharArray();
 
   public static Builder builder() {
     return new Builder();
@@ -46,7 +57,7 @@ public class DimensionVector {
     }
   }
 
-  public boolean empty() {
+  public boolean isEmpty() {
     for (int i = 0; i < vector.length; i++) {
       if (!vector[i].isZero()) {
         return false;
@@ -79,9 +90,36 @@ public class DimensionVector {
     return new DimensionVector(scaled);
   }
 
+  public String localName() {
+    if (this.isEmpty()) {
+      return NOT_APPLICABLE;
+    }
+
+    StringBuilder b = new StringBuilder();
+    for (int i = 0; i < 8; i++) {
+      b.append(dimesionChars[i]);
+      b.append(NF.format(vector[i].floatValue()));
+    }
+    return b.toString().replace(".","dot");
+  }
+
+  public String indexCode() {
+    StringBuilder b = new StringBuilder();
+
+    for (int i = 0; i < 8; i++) {
+      if (!vector[i].isZero()) {
+        b.append(dimesionChars[i]);
+        b.append(NF.format(vector[i].floatValue()));
+      }
+    }
+
+    return b.isEmpty() ? NOT_APPLICABLE : b.toString().replace(".","dot").replace("-","_");
+
+  }
+
   public static DimensionVector add(DimensionVector a, DimensionVector b) {
     SmallFraction[] scaled = new SmallFraction[7];
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
       scaled[i] = SmallFraction.plus(a.vector[i], b.vector[i]);
     }
     return new DimensionVector(scaled);
@@ -114,9 +152,17 @@ public class DimensionVector {
     private SmallFraction time = SmallFraction.ZERO;
     private SmallFraction dimensionless = SmallFraction.ZERO;
 
+    public Builder withAmountOfSubstance(int i) {
+      return withAmountOfSubstance(new SmallFraction(i));
+    }
+
     public Builder withAmountOfSubstance(SmallFraction amountOfSubstance) {
       this.amountOfSubstance = amountOfSubstance;
       return this;
+    }
+
+    public Builder withElectricCurrent(int i) {
+      return withElectricCurrent(new SmallFraction(i));
     }
 
     public Builder withElectricCurrent(SmallFraction electricCurrent) {
@@ -124,9 +170,17 @@ public class DimensionVector {
       return this;
     }
 
+    public Builder withLength(int i) {
+      return withLength(new SmallFraction(i));
+    }
+
     public Builder withLength(SmallFraction length) {
       this.length = length;
       return this;
+    }
+
+    public Builder withLuminousIntensity(int i) {
+      return withLuminousIntensity(new SmallFraction(i));
     }
 
     public Builder withLuminousIntensity(SmallFraction luminousIntensity) {
@@ -134,9 +188,17 @@ public class DimensionVector {
       return this;
     }
 
+    public Builder withMass(int i) {
+      return withMass(new SmallFraction(i));
+    }
+
     public Builder withMass(SmallFraction mass) {
       this.mass = mass;
       return this;
+    }
+
+    public Builder withThermodynamicTemperature(int i) {
+      return withThermodynamicTemperature(new SmallFraction(i));
     }
 
     public Builder withThermodynamicTemperature(SmallFraction thermodynamicTemperature) {
@@ -144,9 +206,17 @@ public class DimensionVector {
       return this;
     }
 
+    public Builder withTime(int i) {
+      return withTime(new SmallFraction(i));
+    }
+
     public Builder withTime(SmallFraction time) {
       this.time = time;
       return this;
+    }
+
+    public Builder withDimensionless(int i) {
+      return withDimensionless(new SmallFraction(i));
     }
 
     public Builder withDimensionless(SmallFraction dimensionless) {

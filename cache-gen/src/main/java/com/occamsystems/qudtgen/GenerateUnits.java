@@ -85,7 +85,7 @@ public class GenerateUnits {
     Configuration freemarker = new Configuration(Configuration.VERSION_2_3_33);
     freemarker.setClassForTemplateLoading(this.getClass(), "templates");
     try {
-      Template template = freemarker.getTemplate("Units.ftl");
+      Template template = freemarker.getTemplate("VectorUnit.ftl");
       String oPath = Path.of(outputFilePath, "units").toString();
       File outDir = new File(oPath);
       boolean ok = outDir.exists() || outDir.mkdirs();
@@ -103,6 +103,21 @@ public class GenerateUnits {
           throw new RuntimeException(e);
         }
       });
+
+      Template indexTemplate = freemarker.getTemplate("UnitIndex.ftl");
+        Environment env = null;
+        try {
+          Map<String, String> fullToShortVector = vectorToUnits.keySet().stream()
+              .collect(Collectors.toMap(s -> s,
+                  GeneratorUtils::shortenVectorName));
+          env = indexTemplate.createProcessingEnvironment(Map.of(
+                  "vocabUrl", UNIT_VOCAB,
+                  "vectors", fullToShortVector),
+              Files.newBufferedWriter(Path.of(oPath, "Units.java")));
+          env.process();
+        } catch (TemplateException | IOException e) {
+          throw new RuntimeException(e);
+        }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

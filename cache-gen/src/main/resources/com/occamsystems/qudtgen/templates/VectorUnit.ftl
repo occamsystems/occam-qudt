@@ -23,7 +23,7 @@ public enum ${vector}Units {
 
   private static LiteralUnit[] cache = null;
 
-  static LiteralUnit[] units() {
+  public static LiteralUnit[] units() {
     if (cache == null) {
       cache = new LiteralUnit[${vector}Units.values().length];
       for (int i = 0; i < ${vector}Units.values().length; i++) {
