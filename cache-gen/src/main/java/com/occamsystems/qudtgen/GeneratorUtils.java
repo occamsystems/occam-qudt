@@ -11,6 +11,7 @@ public class GeneratorUtils {
 
   public static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
   static final String HAS_VECTOR = "http://qudt.org/schema/qudt/hasDimensionVector";
+  static final String REPLACED_BY = "http://purl.org/dc/terms/isReplacedBy";
 
   static double doubleOrElse(Resource res, Property conversionOffset, double v) {
     Statement stm = res.getProperty(conversionOffset);

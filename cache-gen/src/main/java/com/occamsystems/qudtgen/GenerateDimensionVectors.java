@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
@@ -35,40 +36,57 @@ public class GenerateDimensionVectors {
     Property massExp = model.createProperty(MASS_EXPONENT);
 
     ResIterator iterator = model.listSubjectsWithProperty(massExp);
+    Property replaced = model.createProperty(GeneratorUtils.REPLACED_BY);
 
     Map<String, String> vectors = new TreeMap<>();
+    Map<String, String> replacementMap = new HashMap<>();
 
     iterator.forEach(res -> {
-      String localName = res.getLocalName();
-      String regex = "[AELIMHTD]";
-      String[] split = localName.split(regex);
-      int[] array = new int[16];
-      if (split.length >= 9) {
-        for (int i = 0; i < 8; i++) {
-          String expStr = split[i + 1];
-          int dot = expStr.indexOf("dot");
-          int pt = expStr.indexOf("pt");
-          String[] fracSplit = expStr.split("[(dot)(pt)]");
-          int val = fracSplit[0].isBlank() ? 0 : Integer.parseInt(fracSplit[0]);
-          if (dot >= 0 || pt >= 0) {
-            if (fracSplit.length > 1) {
-              array[2 * i] = val * 2 + (fracSplit[0].charAt(0) == '-' ? -1 : 1);
+      Statement isReplaced = res.getProperty(replaced);
+      if (isReplaced == null) {
+        String localName = res.getLocalName();
+        String regex = "[AELIMHTD]";
+        String[] split = localName.split(regex);
+        int[] array = new int[16];
+        if (split.length >= 9) {
+          for (int i = 0; i < 8; i++) {
+            String expStr = split[i + 1];
+            int dot = expStr.indexOf("dot");
+            int pt = expStr.indexOf("pt");
+            String[] fracSplit = expStr.split("[(dot)(pt)]");
+            int val = fracSplit[0].isBlank() ? 0 : Integer.parseInt(fracSplit[0]);
+            if (dot >= 0 || pt >= 0) {
+              if (fracSplit.length > 1) {
+                array[2 * i] = val * 2 + (fracSplit[0].charAt(0) == '-' ? -1 : 1);
+              } else {
+                array[2 * i] = 1;
+              }
+              val = 1; //This helps with correct name generation.
+              array[2 * i + 1] = 2;
             } else {
-              array[2 * i] = 1;
+              array[2 * i] = val;
+              array[2 * i + 1] = 1;
             }
-            val = 1; //This helps with correct name generation.
-            array[2 * i + 1] = 2;
-          }else {
-            array[2 * i] = val;
-            array[2 * i + 1] = 1;
           }
-        }
 
-        vectors.put(GeneratorUtils.shortenVectorName(localName),
-            Arrays.toString(array).replace('[','{').replace(']','}'));
+          vectors.put(GeneratorUtils.shortenVectorName(localName),
+              Arrays.toString(array).replace('[', '{').replace(']', '}'));
+        } else {
+          log.warning("Unable to parse dimension vector " + localName);
+          vectors.put(localName, "{0,0,0,0,0,0,0,0}");
+        }
       } else {
-        log.warning("Unable to parse dimension vector " + localName);
-        vectors.put(localName, "{0,0,0,0,0,0,0,0}");
+        try {
+          replacementMap.put(isReplaced.getSubject().getURI(),
+              isReplaced.getObject().asResource().getURI());
+        } catch (Exception e) {
+          String[] split = isReplaced.getString().split(":");
+          String value = model.getNsPrefixURI(split[0]) + split[1];
+          Logger.getLogger(GenerateUnits.class.getName()).info("Invalid replacement uri for " + isReplaced
+            + "\n Repairing  as " + value);
+          replacementMap.put(isReplaced.getSubject().getURI(),
+              value);
+        }
       }
     });
 
