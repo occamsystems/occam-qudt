@@ -24,7 +24,6 @@ public abstract class Unit {
    * For example, degF.scale(273.15) gives 32.
    */
   double scale(double value) {
-    double offset = dv().unary() ? this.conversionOffset() : 0;
     return value * this.conversionMultiplier() - conversionOffset();
   }
 
@@ -33,8 +32,7 @@ public abstract class Unit {
    * For example, degF.unscale(32) gives 273.15.
    */
   double unscale(double value) {
-    double offset = dv().unary() ? this.conversionOffset() : 0;
-    return (value + offset) * this.conversionMultiplier();
+    return (value + this.conversionOffset()) * this.conversionMultiplier();
   }
 
   @Override
