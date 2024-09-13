@@ -20,4 +20,17 @@ public enum ${vector}Units {
       double co, double cm) {
     u = new LiteralUnit(label, uri, symbol, code, dv, co, cm);
   }
+
+  private static LiteralUnit[] cache = null;
+
+  static LiteralUnit[] units() {
+    if (cache == null) {
+      cache = new LiteralUnit[${vector}Units.values().length];
+      for (int i = 0; i < ${vector}Units.values().length; i++) {
+        cache[i] = ${vector}Units.values()[i].u;
+      }
+    }
+
+    return cache;
+  }
 }
