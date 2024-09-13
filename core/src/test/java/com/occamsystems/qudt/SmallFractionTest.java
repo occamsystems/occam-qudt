@@ -40,4 +40,14 @@ class SmallFractionTest {
 
     Assertions.assertEquals(Integer.toHexString(147), sf2.encodeReduced());
   }
+
+  @Test
+  void approximate() {
+    Assertions.assertEquals(new SmallFraction(3,2),
+        SmallFraction.approximate(1.5));
+    Assertions.assertEquals(new SmallFraction(13,7),
+        SmallFraction.approximate(1.8571));
+    Assertions.assertEquals(new SmallFraction(-2,3),
+        SmallFraction.approximate(-0.6667));
+  }
 }

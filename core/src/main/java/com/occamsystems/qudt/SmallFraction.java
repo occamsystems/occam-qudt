@@ -26,6 +26,22 @@ public class SmallFraction extends Number {
     this.denom = denom;
   }
 
+  /**
+   * Rounds the value to a small fraction if it is approximately equal to such a value.
+   * Denominators of approximate fractions will always be 8 or less.
+   * If no nearby small fraction is found, the value will be rounded to the nearest integer.
+   */
+  public static SmallFraction approximate(double val) {
+    for (int i = 1; i < 9; i++) {
+      double vi = val * i;
+      if (Math.abs(vi - Math.round(vi)) < 0.01) {
+        return new SmallFraction((int) Math.round(vi), i);
+      }
+    }
+
+    return new SmallFraction((int) val);
+  }
+
   public int intValue() {
     return num / denom;
   }
