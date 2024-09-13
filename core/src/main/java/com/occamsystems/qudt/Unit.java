@@ -35,9 +35,15 @@ public abstract class Unit {
     return (value + this.conversionOffset()) * this.conversionMultiplier();
   }
 
+  public boolean equivalent(Unit other) {
+    return other != null && this.dv().equals(other.dv())
+        && this.conversionMultiplier() == other.conversionMultiplier()
+        && this.conversionOffset() == other.conversionOffset();
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(dv(), conversionMultiplier(), conversionOffset());
+    return Objects.hash(symbol(), dv(), conversionMultiplier(), conversionOffset());
   }
 
   @Override
