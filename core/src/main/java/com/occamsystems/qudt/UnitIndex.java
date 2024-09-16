@@ -175,4 +175,35 @@ public class UnitIndex {
         .toString();
 
   }
+
+  LiteralUnit predefinedUnitBySymbol(String symbol) {
+    return Units.byDV.values().stream().flatMap(Arrays::stream)
+        .filter(u -> u.symbol().equals(symbol) || toKeyboardChars(u.symbol()).equals(symbol))
+        .sorted(this::preferredUnit)
+        .findFirst()
+        .orElse(null);
+  }
+
+  private int preferredUnit(Unit u1, Unit u2) {
+    boolean pref1 = this.preferredUnits.contains(u1);
+    boolean pref2 = this.preferredUnits.contains(u2);
+
+    if (pref1 && !pref2) {
+      return -1;
+    }
+    if (!pref1 && pref2) {
+      return 1;
+    }
+
+    int suQk = kindsByDimensionVector().getOrDefault(u1.dv(),
+        Collections.emptyList()).size();
+    int pQk = kindsByDimensionVector().getOrDefault(u2.dv(),
+        Collections.emptyList()).size();
+
+    if (suQk != pQk) {
+      return suQk - pQk;
+    }
+
+    return u1.hashCode() - u2.hashCode();
+  }
 }

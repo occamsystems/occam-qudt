@@ -1,6 +1,8 @@
 package com.occamsystems.qudt;
 
 import com.occamsystems.qudt.predefined.units.H1Units;
+import com.occamsystems.qudt.predefined.units.L1M1T_2Units;
+import com.occamsystems.qudt.predefined.units.L1M1Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
@@ -46,5 +48,14 @@ class UnitIndexTest {
 
     Assertions.assertEquals(L1Units.MicroM.u, map.get("um"));
     Assertions.assertEquals(H1Units.DEG_C.u, map.get("degC"));
+  }
+
+  @Test
+  void predefinedSymbol() {
+    UnitIndex unitIndex = new UnitIndex();
+    Assertions.assertEquals(L3Units.L.u, unitIndex.predefinedUnitBySymbol("L"));
+    Assertions.assertEquals(L1Units.M.u, unitIndex.predefinedUnitBySymbol("m"));
+    Assertions.assertEquals(L1M1Units.KiloGM_M.u, unitIndex.predefinedUnitBySymbol("kg*m"));
+    Assertions.assertEquals(L1M1T_2Units.KiloGM_M_PER_SEC2.u, unitIndex.predefinedUnitBySymbol("kg*m/s2"));
   }
 }
