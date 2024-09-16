@@ -123,6 +123,11 @@ public class DimensionVector {
   }
 
   @Override
+  public String toString() {
+    return "DimensionVector:" + this.indexCode();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

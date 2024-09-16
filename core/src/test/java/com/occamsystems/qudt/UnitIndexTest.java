@@ -1,11 +1,11 @@
 package com.occamsystems.qudt;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import com.occamsystems.qudt.predefined.units.H1Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,5 +37,14 @@ class UnitIndexTest {
     Assertions.assertEquals(L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.DeciM.u, 3)));
     Assertions.assertEquals(L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.M.u, 2, L1Units.MilliM.u, 1)));
     Assertions.assertEquals(L1Units.DeciM.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L3Units.L.u, new SmallFraction(1, 3))));
+  }
+
+  @Test
+  void simpleSymbolMap() {
+    UnitIndex unitIndex = new UnitIndex();
+    Map<String, LiteralUnit> map = unitIndex.simpleSymbolMap();
+
+    Assertions.assertEquals(L1Units.MicroM.u, map.get("um"));
+    Assertions.assertEquals(H1Units.DEG_C.u, map.get("degC"));
   }
 }
