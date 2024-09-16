@@ -47,9 +47,9 @@ public class GenerateDimensionVectors {
         String localName = res.getLocalName();
         String regex = "[AELIMHTD]";
         String[] split = localName.split(regex);
-        int[] array = new int[16];
+        int[] array = new int[14];
         if (split.length >= 9) {
-          for (int i = 0; i < 8; i++) {
+          for (int i = 0; i < 7; i++) {
             String expStr = split[i + 1];
             int dot = expStr.indexOf("dot");
             int pt = expStr.indexOf("pt");
@@ -73,7 +73,7 @@ public class GenerateDimensionVectors {
               Arrays.toString(array).replace('[', '{').replace(']', '}'));
         } else {
           log.warning("Unable to parse dimension vector " + localName);
-          vectors.put(localName, "{0,0,0,0,0,0,0,0}");
+          vectors.put(localName, "{0,0,0,0,0,0,0}");
         }
       } else {
         try {

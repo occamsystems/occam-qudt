@@ -13,7 +13,7 @@ class DimensionVectorTest {
   @Test
   void localName() {
     DimensionVector build = DimensionVector.builder().build();
-    Assertions.assertEquals("NotApplicable", build.localName());
+    Assertions.assertEquals("A0E0L0I0M0H0T0D1", build.localName());
     build = DimensionVector.builder().withLength(1).build();
     Assertions.assertEquals("A0E0L1I0M0H0T0D0", build.localName());
     build = DimensionVector.builder().withThermodynamicTemperature(new SmallFraction(-3,2))
@@ -24,7 +24,7 @@ class DimensionVectorTest {
   @Test
   void indexCode() {
     DimensionVector build = DimensionVector.builder().build();
-    Assertions.assertEquals("NotApplicable", build.indexCode());
+    Assertions.assertEquals("D1", build.indexCode());
     build = DimensionVector.builder().withLength(1).build();
     Assertions.assertEquals("L1", build.indexCode());
     build = DimensionVector.builder().withThermodynamicTemperature(new SmallFraction(-3,2))

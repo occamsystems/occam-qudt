@@ -29,4 +29,12 @@ class UnitIndexTest {
 
     System.out.println(literalUnits.stream().map(u -> u.symbol() + "\t:\t" + u.ucumCode()).distinct().collect(Collectors.joining("\n")));
   }
+
+  @Test
+  void bestPredefinedMatch() {
+    UnitIndex unitIndex = new UnitIndex();
+    Assertions.assertEquals(L3Units.DeciM3.u, unitIndex.bestPredefinedMatch(L3Units.DeciM3.u));
+    Assertions.assertEquals(L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.DeciM.u, 3)));
+    Assertions.assertEquals(L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.M.u, 2, L1Units.MilliM.u, 1)));
+  }
 }

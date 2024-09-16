@@ -9,15 +9,9 @@ import java.util.Arrays;
 public class DimensionVector {
 
   public static final DimensionVector DIMENSIONLESS = DimensionVector.builder().build();
-  public static final String NOT_APPLICABLE = "NotApplicable";
-  public static final NumberFormat NF;
-
-  static {
-    NF = NumberFormat.getNumberInstance();
-    NF.setMaximumFractionDigits(2);
-    NF.setMinimumFractionDigits(0);
-  }
-  private final SmallFraction[] vector = new SmallFraction[8];
+  public static final String DIMENSIONLESS_NAME = "A0E0L0I0M0H0T0D1";
+  public static final String DIMENSIONLESS_CODE = "D1";
+  private final SmallFraction[] vector = new SmallFraction[7];
   public static final int amountOfSubstance = 0;
   public static final int electricCurrent = 1;
   public static final int length = 2;
@@ -25,7 +19,6 @@ public class DimensionVector {
   public static final int mass = 4;
   public static final int thermodynamicTemperature = 5;
   public static final int time = 6;
-  public static final int dimensionless = 7;
 
   private static final char[] dimesionChars = "AELIMHTD".toCharArray();
 
@@ -34,15 +27,15 @@ public class DimensionVector {
   }
 
   public DimensionVector(int[] numDenomArray) {
-    if (numDenomArray.length != 8 && numDenomArray.length != 16) {
+    if (numDenomArray.length != 7 && numDenomArray.length != 14) {
       throw new IllegalArgumentException("Dimension vector int[] constructor must have length "
-          + "8 for simple int values or "
-          + "16 for fractional values.");
+          + "7 for simple int values or "
+          + "14 for fractional values.");
     }
 
-    boolean hasDenoms = numDenomArray.length == 16;
+    boolean hasDenoms = numDenomArray.length == 14;
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
       if (hasDenoms) {
         this.vector[i] = new SmallFraction(numDenomArray[2 * i], numDenomArray[2 * i + 1]);
       } else {
@@ -55,6 +48,10 @@ public class DimensionVector {
     for (int i = 0; i < smallFractions.length; i++) {
       this.vector[i] = smallFractions[i];
     }
+  }
+
+  public boolean dimensionless() {
+    return this.isEmpty();
   }
 
   public boolean isEmpty() {
@@ -83,7 +80,7 @@ public class DimensionVector {
   }
 
   public DimensionVector scaledBy(SmallFraction value) {
-    SmallFraction[] scaled = new SmallFraction[8];
+    SmallFraction[] scaled = new SmallFraction[7];
     for (int i = 0; i < this.vector.length; i++) {
         scaled[i] = SmallFraction.times(this.vector[i], value);
     }
@@ -92,34 +89,34 @@ public class DimensionVector {
 
   public String localName() {
     if (this.isEmpty()) {
-      return NOT_APPLICABLE;
+      return DIMENSIONLESS_NAME;
     }
 
     StringBuilder b = new StringBuilder();
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
       b.append(dimesionChars[i]);
-      b.append(NF.format(vector[i].floatValue()));
+      b.append(vector[i].toDecimalString());
     }
-    return b.toString().replace(".","dot");
+
+    return b.append("D0").toString().replace(".","dot");
   }
 
   public String indexCode() {
     StringBuilder b = new StringBuilder();
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
       if (!vector[i].isZero()) {
         b.append(dimesionChars[i]);
-        b.append(NF.format(vector[i].floatValue()));
+        b.append(vector[i].toDecimalString());
       }
     }
 
-    return b.isEmpty() ? NOT_APPLICABLE : b.toString().replace(".","dot").replace("-","_");
-
+    return b.isEmpty() ? DIMENSIONLESS_CODE : b.toString().replace(".","dot").replace("-","_");
   }
 
   public static DimensionVector add(DimensionVector a, DimensionVector b) {
     SmallFraction[] scaled = new SmallFraction[7];
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 7; i++) {
       scaled[i] = SmallFraction.plus(a.vector[i], b.vector[i]);
     }
     return new DimensionVector(scaled);
@@ -231,8 +228,7 @@ public class DimensionVector {
       this.luminousIntensity,
       this.mass,
       this.thermodynamicTemperature,
-      this.time,
-      this.dimensionless});
+      this.time});
     }
   }
 }

@@ -1,5 +1,6 @@
 package com.occamsystems.qudt;
 
+import java.text.NumberFormat;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -16,6 +17,14 @@ public class SmallFraction extends Number {
   public static SmallFraction ONE = new SmallFraction( 1);
   private int num;
   private int denom;
+
+  public static final NumberFormat NF;
+
+  static {
+    NF = NumberFormat.getNumberInstance();
+    NF.setMaximumFractionDigits(3);
+    NF.setMinimumFractionDigits(0);
+  }
 
   public SmallFraction(int value) {
     this(value, 1);
@@ -148,6 +157,10 @@ public class SmallFraction extends Number {
     }
 
     return num + "/" + denom;
+  }
+
+  public String toDecimalString() {
+    return NF.format(this.floatValue());
   }
 
   public boolean isZero() {

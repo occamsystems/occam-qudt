@@ -2,6 +2,7 @@ package com.occamsystems.qudt;
 
 import com.occamsystems.qudt.predefined.Units;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -27,5 +28,27 @@ public class UnitIndex {
     }
 
     return simpleUnits;
+  }
+
+  /**
+   * If the unit is not already a LiteralUnit, returns the best matched unit from among predefined
+   * units.
+   * Match quality is defined as similarity of conversion multiplier, then symbolic concision.
+   * (e.g., L is preferred to dm3.)
+   * This will be null if and only if the dimension vector of the supplied unit has no
+   * predefined units.
+   */
+  LiteralUnit bestPredefinedMatch(Unit base) {
+    if (base instanceof LiteralUnit lu) {
+      return lu;
+    }
+
+    LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[]{});
+
+    double baseConvLog = Math.log(base.conversionMultiplier());
+    return Arrays.stream(matches)
+        .sorted(Comparator.comparing(u -> Math.abs(Math.log(((Unit) u).conversionMultiplier()) - baseConvLog))
+        .thenComparing(u -> ((Unit) u).symbol().length()))
+        .findFirst().orElse(null);
   }
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
@@ -55,17 +56,19 @@ public class AggregateUnit extends Unit{
 
   @Override
   public String label() {
-    return null;
+    return "";
   }
 
   @Override
   public String symbol() {
-    return null;
+    return this.components.entrySet().stream()
+        .map(e -> e.getKey().symbol() + numbersToSuperscript(e.getValue().toDecimalString()))
+        .collect(Collectors.joining("⋅"));
   }
 
   @Override
   public String ucumCode() {
-    return null;
+    return "";
   }
 
   @Override
@@ -94,5 +97,26 @@ public class AggregateUnit extends Unit{
     }
 
     return 0;
+  }
+
+  public static String numbersToSuperscript(String input) {
+    return input
+        .chars()
+        .mapToObj(
+            c -> {
+              if (c == 49) {
+                return (char) 185; // Handle 1 to superscript
+              } else if (c == 50 || c == 51) {
+                return (char) (c + 128); // Handle 2-3 to superscript
+              } else if (c == 48 || (c > 51 && c < 58)) {
+                return (char) (c + 8256); // Handle 4-0 to superscript
+              } else if (c == 45) {
+                return (char) 0x207b; //minus
+              }
+
+              return (char) c;
+            })
+        .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+        .toString();
   }
 }

@@ -1,11 +1,18 @@
 package com.occamsystems.qudt;
 
+import com.occamsystems.qudt.predefined.units.D1Units;
+import com.occamsystems.qudt.predefined.units.NotApplicableUnits;
+
 /**
  * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
  */
 public class QuantityValue {
   double unscaled;
   Unit unit;
+
+  public static QuantityValue ofNumber(double value) {
+    return new QuantityValue(value, D1Units.NUM.u);
+  }
 
   public static QuantityValue ofScaled(double value, Unit unit) {
     return new QuantityValue(unit.unscale(value), unit);
