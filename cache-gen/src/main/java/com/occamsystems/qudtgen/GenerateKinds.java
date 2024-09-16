@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.StmtIterator;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 public class GenerateKinds {
   public static final String KIND_VOCAB = "https://qudt.org/2.1/vocab/quantitykind";

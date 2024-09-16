@@ -8,7 +8,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 @Mojo(name = "generate-all", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GeneratorMojo extends AbstractMojo {

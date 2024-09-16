@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 public class AggregateUnit extends Unit{
   Map<LiteralUnit, SmallFraction> components;

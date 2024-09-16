@@ -3,7 +3,7 @@ package com.occamsystems.qudt;
 import java.util.Objects;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 public abstract class Unit {
   abstract String label();

@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Statement;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 public class GenerateUnits {
   public static final String UNIT_VOCAB = "https://qudt.org/2.1/vocab/unit";

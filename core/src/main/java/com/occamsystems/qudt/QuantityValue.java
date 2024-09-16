@@ -4,7 +4,7 @@ import com.occamsystems.qudt.predefined.units.D1Units;
 import com.occamsystems.qudt.predefined.units.NotApplicableUnits;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 public class QuantityValue {
   double unscaled;

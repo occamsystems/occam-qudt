@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
+ * Copyright (c)  2024 Occam Systems, Inc.
  */
 public class UnitIndex {
 

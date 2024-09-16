@@ -5,11 +5,12 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
+ * Copyright (c)  2024 Occam Systems, Inc.
+ *
  * This class handles rational numbers with short numerator and denominator values.
  * This is intended to be used by dimension vectors, whose denominators are normally 1,
  * sometimes 2, and may rarely go as high as 4.
  * Similarly, numerators above 16 essentially never happen.
- * Copyright (c) 2022 - 2024 Occam Systems, Inc. All rights reserved.
  */
 public class SmallFraction extends Number {
 
