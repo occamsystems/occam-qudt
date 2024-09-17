@@ -1,9 +1,10 @@
 package com.occamsystems.qudt;
 
 import com.occamsystems.qudt.predefined.units.D1Units;
+import java.util.Objects;
 
 /** Copyright (c) 2024 Occam Systems, Inc. */
-public class QuantityValue {
+public class QuantityValue implements Comparable<QuantityValue> {
   double unscaled;
   Unit unit;
 
@@ -61,5 +62,36 @@ public class QuantityValue {
   public static QuantityValue multiply(QuantityValue qv1, QuantityValue qv2) {
     return new QuantityValue(
         qv1.unscaled * qv2.unscaled, new AggregateUnit(qv1.unit, 1, qv2.unit, 1));
+  }
+
+  @Override
+  public String toString() {
+    return "%s %s".formatted(value(), unit);
+  }
+
+  @Override
+  public int compareTo(QuantityValue o) {
+    if (this.unit.isConvertable(o.unit)) {
+      return Double.compare(this.unscaled, o.unscaled);
+    }
+
+    throw new IllegalArgumentException("Cannot compare " + this + " to " + o);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    QuantityValue that = (QuantityValue) o;
+    return Double.compare(that.unscaled, unscaled) == 0 && unit.isConvertable(that.unit);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(unscaled, unit.dv().hashCode());
   }
 }

@@ -133,8 +133,8 @@ public class AggregateUnit extends Unit {
   @Override
   public double conversionOffset() {
     if (this.dv().unary()) {
-      this.components.entrySet().stream()
-          .mapToDouble(e -> e.getKey().conversionMultiplier())
+      return this.components.keySet().stream()
+          .mapToDouble(LiteralUnit::conversionMultiplier)
           .findAny()
           .orElse(0.);
     }
