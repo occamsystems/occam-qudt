@@ -1,11 +1,8 @@
 package com.occamsystems.qudt;
 
-import java.text.NumberFormat;
 import java.util.Arrays;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public class DimensionVector {
 
   public static final DimensionVector DIMENSIONLESS = DimensionVector.builder().build();
@@ -28,9 +25,10 @@ public class DimensionVector {
 
   public DimensionVector(int[] numDenomArray) {
     if (numDenomArray.length != 7 && numDenomArray.length != 14) {
-      throw new IllegalArgumentException("Dimension vector int[] constructor must have length "
-          + "7 for simple int values or "
-          + "14 for fractional values.");
+      throw new IllegalArgumentException(
+          "Dimension vector int[] constructor must have length "
+              + "7 for simple int values or "
+              + "14 for fractional values.");
     }
 
     boolean hasDenoms = numDenomArray.length == 14;
@@ -82,7 +80,7 @@ public class DimensionVector {
   public DimensionVector scaledBy(SmallFraction value) {
     SmallFraction[] scaled = new SmallFraction[7];
     for (int i = 0; i < this.vector.length; i++) {
-        scaled[i] = SmallFraction.times(this.vector[i], value);
+      scaled[i] = SmallFraction.times(this.vector[i], value);
     }
     return new DimensionVector(scaled);
   }
@@ -98,7 +96,7 @@ public class DimensionVector {
       b.append(vector[i].toDecimalString());
     }
 
-    return b.append("D0").toString().replace(".","dot");
+    return b.append("D0").toString().replace(".", "dot");
   }
 
   public String indexCode() {
@@ -111,7 +109,7 @@ public class DimensionVector {
       }
     }
 
-    return b.isEmpty() ? DIMENSIONLESS_CODE : b.toString().replace(".","dot").replace("-","_");
+    return b.isEmpty() ? DIMENSIONLESS_CODE : b.toString().replace(".", "dot").replace("-", "_");
   }
 
   public static DimensionVector add(DimensionVector a, DimensionVector b) {
@@ -227,13 +225,16 @@ public class DimensionVector {
     }
 
     public DimensionVector build() {
-      return new DimensionVector(new SmallFraction[]{this.amountOfSubstance,
-      this.electricCurrent,
-      this.length,
-      this.luminousIntensity,
-      this.mass,
-      this.thermodynamicTemperature,
-      this.time});
+      return new DimensionVector(
+          new SmallFraction[] {
+            this.amountOfSubstance,
+            this.electricCurrent,
+            this.length,
+            this.luminousIntensity,
+            this.mass,
+            this.thermodynamicTemperature,
+            this.time
+          });
     }
   }
 }

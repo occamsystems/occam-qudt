@@ -3,9 +3,7 @@ package com.occamsystems.qudt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 class SmallFractionTest {
   @Test
   void create() {
@@ -43,11 +41,8 @@ class SmallFractionTest {
 
   @Test
   void approximate() {
-    Assertions.assertEquals(new SmallFraction(3,2),
-        SmallFraction.approximate(1.5));
-    Assertions.assertEquals(new SmallFraction(13,7),
-        SmallFraction.approximate(1.8571));
-    Assertions.assertEquals(new SmallFraction(-2,3),
-        SmallFraction.approximate(-0.6667));
+    Assertions.assertEquals(new SmallFraction(3, 2), SmallFraction.approximate(1.5));
+    Assertions.assertEquals(new SmallFraction(13, 7), SmallFraction.approximate(1.8571));
+    Assertions.assertEquals(new SmallFraction(-2, 3), SmallFraction.approximate(-0.6667));
   }
 }

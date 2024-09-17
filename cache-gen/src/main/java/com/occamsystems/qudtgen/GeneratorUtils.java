@@ -4,9 +4,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public class GeneratorUtils {
 
   public static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
@@ -21,19 +19,19 @@ public class GeneratorUtils {
   static String bestString(Resource res, Property prop) {
     Statement en = res.getProperty(prop, "en");
     if (en != null) {
-      return en.getString().replace("\"","\\\"");
+      return en.getString().replace("\"", "\\\"");
     }
 
     Statement any = res.getProperty(prop);
     if (any != null) {
-      return any.getString().replace("\"","\\\"");
+      return any.getString().replace("\"", "\\\"");
     }
 
     return "";
   }
 
   public static String toConstName(String base) {
-    return base.replaceAll("([a-z\\d])([A-Z])", "$1_$2").replace("-","_").toUpperCase();
+    return base.replaceAll("([a-z\\d])([A-Z])", "$1_$2").replace("-", "_").toUpperCase();
   }
 
   public static String shortenVectorName(String longName) {
@@ -47,9 +45,7 @@ public class GeneratorUtils {
     StringBuilder b = new StringBuilder();
     for (int i = 0; i < split.length; i++) {
       if (!split[i].isBlank() && !"0".equals(split[i])) {
-        b.append(regex.charAt(i)).append(split[i]
-            .replace("-","_")
-            .replace("pt", "dot"));
+        b.append(regex.charAt(i)).append(split[i].replace("-", "_").replace("pt", "dot"));
       }
     }
 

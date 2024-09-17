@@ -5,17 +5,16 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
- * Copyright (c)  2024 Occam Systems, Inc.
+ * Copyright (c) 2024 Occam Systems, Inc.
  *
- * This class handles rational numbers with short numerator and denominator values.
- * This is intended to be used by dimension vectors, whose denominators are normally 1,
- * sometimes 2, and may rarely go as high as 4.
- * Similarly, numerators above 16 essentially never happen.
+ * <p>This class handles rational numbers with short numerator and denominator values. This is
+ * intended to be used by dimension vectors, whose denominators are normally 1, sometimes 2, and may
+ * rarely go as high as 4. Similarly, numerators above 16 essentially never happen.
  */
 public class SmallFraction extends Number {
 
   public static SmallFraction ZERO = new SmallFraction(0, 1);
-  public static SmallFraction ONE = new SmallFraction( 1);
+  public static SmallFraction ONE = new SmallFraction(1);
   private int num;
   private int denom;
 
@@ -37,9 +36,9 @@ public class SmallFraction extends Number {
   }
 
   /**
-   * Rounds the value to a small fraction if it is approximately equal to such a value.
-   * Denominators of approximate fractions will always be 8 or less.
-   * If no nearby small fraction is found, the value will be rounded to the nearest integer.
+   * Rounds the value to a small fraction if it is approximately equal to such a value. Denominators
+   * of approximate fractions will always be 8 or less. If no nearby small fraction is found, the
+   * value will be rounded to the nearest integer.
    */
   public static SmallFraction approximate(double val) {
     for (int i = 1; i < 9; i++) {
@@ -70,6 +69,7 @@ public class SmallFraction extends Number {
 
   /**
    * Reduces this fraction, then returns itself.
+   *
    * @return This fraction, reduced.
    */
   public SmallFraction reduce() {
@@ -85,7 +85,6 @@ public class SmallFraction extends Number {
     return this;
   }
 
-
   private static int gcd(int a, int b) {
     return b == 0 ? a : gcd(b, a % b);
   }
@@ -94,8 +93,7 @@ public class SmallFraction extends Number {
     if (f1.denom == 1) {
       return new SmallFraction(f1.num + f2);
     } else {
-      return new SmallFraction(f1.num + f2 * f1.denom,
-          f1.denom);
+      return new SmallFraction(f1.num + f2 * f1.denom, f1.denom);
     }
   }
 
@@ -103,8 +101,7 @@ public class SmallFraction extends Number {
     if (f1.denom == f2.denom) {
       return new SmallFraction(f1.num + f2.num, f1.denom);
     } else {
-      return new SmallFraction(f1.num * f2.denom + f2.num * f1.denom,
-          f1.denom * f2.denom);
+      return new SmallFraction(f1.num * f2.denom + f2.num * f1.denom, f1.denom * f2.denom);
     }
   }
 
@@ -112,10 +109,8 @@ public class SmallFraction extends Number {
     if (f1.denom == f2.denom) {
       return new SmallFraction(f1.num - f2.num, f1.denom);
     } else {
-      return new SmallFraction(f1.num * f2.denom - f2.num * f1.denom,
-          f1.denom * f2.denom);
+      return new SmallFraction(f1.num * f2.denom - f2.num * f1.denom, f1.denom * f2.denom);
     }
-
   }
 
   public static SmallFraction times(SmallFraction f, SmallFraction mult) {

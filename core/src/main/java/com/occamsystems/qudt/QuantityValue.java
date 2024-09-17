@@ -1,11 +1,8 @@
 package com.occamsystems.qudt;
 
 import com.occamsystems.qudt.predefined.units.D1Units;
-import com.occamsystems.qudt.predefined.units.NotApplicableUnits;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public class QuantityValue {
   double unscaled;
   Unit unit;
@@ -22,7 +19,7 @@ public class QuantityValue {
     return new QuantityValue(value, unit);
   }
 
-   private QuantityValue(double unscaled, Unit unit) {
+  private QuantityValue(double unscaled, Unit unit) {
     this.unscaled = unscaled;
     this.unit = unit;
   }
@@ -32,33 +29,29 @@ public class QuantityValue {
   }
 
   public static QuantityValue divide(QuantityValue qv1, QuantityValue qv2) {
-    return new QuantityValue(qv1.unscaled / qv2.unscaled,
-        new AggregateUnit(qv1.unit, 1, qv2.unit, -1));
+    return new QuantityValue(
+        qv1.unscaled / qv2.unscaled, new AggregateUnit(qv1.unit, 1, qv2.unit, -1));
   }
 
   public static QuantityValue add(QuantityValue qv1, QuantityValue qv2) {
     assert qv1.unit.isConvertable(qv2.unit);
 
-    return new QuantityValue(qv1.unscaled + qv2.unscaled,
-        qv1.unit);
+    return new QuantityValue(qv1.unscaled + qv2.unscaled, qv1.unit);
   }
-
 
   public static QuantityValue subtract(QuantityValue qv1, QuantityValue qv2) {
     assert qv1.unit.isConvertable(qv2.unit);
 
-    return new QuantityValue(qv1.unscaled - qv2.unscaled,
-        qv1.unit);
+    return new QuantityValue(qv1.unscaled - qv2.unscaled, qv1.unit);
   }
 
   public static QuantityValue pow(QuantityValue qv1, int pow) {
-    return new QuantityValue(Math.pow(qv1.unscaled, pow),
-        new AggregateUnit(qv1.unit, pow));
+    return new QuantityValue(Math.pow(qv1.unscaled, pow), new AggregateUnit(qv1.unit, pow));
   }
 
   public static QuantityValue pow(QuantityValue qv1, SmallFraction pow) {
-    return new QuantityValue(Math.pow(qv1.unscaled, pow.doubleValue()),
-        new AggregateUnit(qv1.unit, pow));
+    return new QuantityValue(
+        Math.pow(qv1.unscaled, pow.doubleValue()), new AggregateUnit(qv1.unit, pow));
   }
 
   public static QuantityValue pow(QuantityValue qv1, int powNum, int powDenom) {
@@ -66,8 +59,7 @@ public class QuantityValue {
   }
 
   public static QuantityValue multiply(QuantityValue qv1, QuantityValue qv2) {
-    return new QuantityValue(qv1.unscaled * qv2.unscaled,
-        new AggregateUnit(qv1.unit, 1, qv2.unit, 1));
+    return new QuantityValue(
+        qv1.unscaled * qv2.unscaled, new AggregateUnit(qv1.unit, 1, qv2.unit, 1));
   }
-
 }

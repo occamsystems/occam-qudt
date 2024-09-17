@@ -19,13 +19,12 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.StmtIterator;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public class GenerateKinds {
   public static final String KIND_VOCAB = "https://qudt.org/2.1/vocab/quantitykind";
 
   public static final String BROADER = "http://www.w3.org/2004/02/skos/core#broader";
+
   public void run(String outputFilePath) {
     Model model = ModelFactory.createDefaultModel();
     model.read(KIND_VOCAB, "TTL");
@@ -39,29 +38,36 @@ public class GenerateKinds {
     Map<String, String> kinds = new HashMap<>();
     DepthTree depthTree = new DepthTree();
 
-    iterator.forEach(res -> {
-      String localName = res.getLocalName();
-      String vectorName = GeneratorUtils.shortenVectorName(res.getProperty(hasVector).getObject().asResource().getLocalName());
-      StringBuilder args = new StringBuilder("\"%s\",\"%s\",%s".formatted(
-          GeneratorUtils.bestString(res, label),
-          localName,
-          "DimensionVectors." + vectorName));
+    iterator.forEach(
+        res -> {
+          String localName = res.getLocalName();
+          String vectorName =
+              GeneratorUtils.shortenVectorName(
+                  res.getProperty(hasVector).getObject().asResource().getLocalName());
+          StringBuilder args =
+              new StringBuilder(
+                  "\"%s\",\"%s\",%s"
+                      .formatted(
+                          GeneratorUtils.bestString(res, label),
+                          localName,
+                          "DimensionVectors." + vectorName));
 
-      StmtIterator stmtIterator = res.listProperties(broader);
+          StmtIterator stmtIterator = res.listProperties(broader);
 
-      String resKey = GeneratorUtils.toConstName(localName);
-      stmtIterator.forEach(stm -> {
-        String lName = stm.getObject().asResource().getLocalName();
-        String key = GeneratorUtils.toConstName(lName);
-        args.append(',').append(key);
-        depthTree.insert(resKey, key);
-      });
+          String resKey = GeneratorUtils.toConstName(localName);
+          stmtIterator.forEach(
+              stm -> {
+                String lName = stm.getObject().asResource().getLocalName();
+                String key = GeneratorUtils.toConstName(lName);
+                args.append(',').append(key);
+                depthTree.insert(resKey, key);
+              });
 
-      kinds.put(resKey,
-          args.toString());
-    });
+          kinds.put(resKey, args.toString());
+        });
 
-    Map<String, String> sortedKinds = new TreeMap<>(Comparator.comparing(depthTree::depth).thenComparing(a -> a));
+    Map<String, String> sortedKinds =
+        new TreeMap<>(Comparator.comparing(depthTree::depth).thenComparing(a -> a));
     sortedKinds.putAll(kinds);
 
     Configuration freemarker = new Configuration(Configuration.VERSION_2_3_33);
@@ -70,11 +76,13 @@ public class GenerateKinds {
       Template template = freemarker.getTemplate("QuantityKinds.ftl");
       File outDir = new File(outputFilePath);
       boolean ok = outDir.exists() || outDir.mkdirs();
-      Environment env = template.createProcessingEnvironment(Map.of(
-              "vocabUrl", KIND_VOCAB,
-              "kinds", sortedKinds,
-              "names", sortedKinds.keySet().stream().collect(Collectors.joining(",\n\t\t"))),
-          Files.newBufferedWriter(Path.of(outputFilePath, "QuantityKinds.java")));
+      Environment env =
+          template.createProcessingEnvironment(
+              Map.of(
+                  "vocabUrl", KIND_VOCAB,
+                  "kinds", sortedKinds,
+                  "names", sortedKinds.keySet().stream().collect(Collectors.joining(",\n\t\t"))),
+              Files.newBufferedWriter(Path.of(outputFilePath, "QuantityKinds.java")));
       env.process();
     } catch (IOException | TemplateException e) {
       throw new RuntimeException(e);
@@ -88,6 +96,7 @@ public class GenerateKinds {
 
   private class DepthTree {
     private Map<String, DepthNode> nodes = new HashMap<>();
+
     public void insert(String key, String parent) {
       DepthNode pNode = this.nodes.computeIfAbsent(parent, DepthNode::new);
       DepthNode kNode = this.nodes.computeIfAbsent(key, DepthNode::new);

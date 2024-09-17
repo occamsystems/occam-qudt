@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
-public class AggregateUnit extends Unit{
+/** Copyright (c) 2024 Occam Systems, Inc. */
+public class AggregateUnit extends Unit {
   Map<LiteralUnit, SmallFraction> components;
 
   public static AggregateUnit empty = new AggregateUnit(null, 0);
@@ -49,17 +47,19 @@ public class AggregateUnit extends Unit{
       components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, i1));
       components.computeIfAbsent(lu, u -> i1);
     } else if (unit instanceof AggregateUnit agg) {
-      agg.components.forEach((lu, lui) -> {
-        SmallFraction sf = SmallFraction.times(lui, i1).reduce();
-        components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, sf));
-        components.putIfAbsent(lu, sf);
-      });
+      agg.components.forEach(
+          (lu, lui) -> {
+            SmallFraction sf = SmallFraction.times(lui, i1).reduce();
+            components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, sf));
+            components.putIfAbsent(lu, sf);
+          });
     }
 
-    List<LiteralUnit> zeroes = this.components.entrySet().stream()
-        .filter(e -> e.getValue().isZero())
-        .map(Entry::getKey)
-        .toList();
+    List<LiteralUnit> zeroes =
+        this.components.entrySet().stream()
+            .filter(e -> e.getValue().isZero())
+            .map(Entry::getKey)
+            .toList();
 
     zeroes.forEach(this.components::remove);
   }
@@ -73,13 +73,14 @@ public class AggregateUnit extends Unit{
   public String symbol() {
     return this.components.entrySet().stream()
         .sorted(Comparator.comparing(e -> -e.getValue().floatValue()))
-        .map(e -> {
-          if (e.getValue().isOne()) {
-            return e.getKey().symbol();
-          }
+        .map(
+            e -> {
+              if (e.getValue().isOne()) {
+                return e.getKey().symbol();
+              }
 
-          return e.getKey().symbol() + numbersToSuperscript(e.getValue().toDecimalString());
-        })
+              return e.getKey().symbol() + numbersToSuperscript(e.getValue().toDecimalString());
+            })
         .collect(Collectors.joining("⋅"));
   }
 
@@ -90,16 +91,14 @@ public class AggregateUnit extends Unit{
 
   @Override
   public DimensionVector dv() {
-    return this.components.entrySet()
-        .stream()
+    return this.components.entrySet().stream()
         .map(entry -> entry.getKey().dv().scaledBy(entry.getValue()))
         .reduce(DimensionVector.DIMENSIONLESS, DimensionVector::add);
   }
 
   @Override
   public double conversionMultiplier() {
-    return this.components.entrySet()
-        .stream()
+    return this.components.entrySet().stream()
         .mapToDouble(e -> Math.pow(e.getKey().conversionMultiplier(), e.getValue().doubleValue()))
         .reduce(1.0, (a, b) -> a * b);
   }
@@ -107,10 +106,10 @@ public class AggregateUnit extends Unit{
   @Override
   public double conversionOffset() {
     if (this.dv().unary()) {
-      this.components.entrySet()
-          .stream()
+      this.components.entrySet().stream()
           .mapToDouble(e -> e.getKey().conversionMultiplier())
-          .findAny().orElse(0.);
+          .findAny()
+          .orElse(0.);
     }
 
     return 0;
@@ -128,7 +127,7 @@ public class AggregateUnit extends Unit{
               } else if (c == 48 || (c > 51 && c < 58)) {
                 return (char) (c + 8256); // Handle 4-0 to superscript
               } else if (c == 45) {
-                return (char) 0x207b; //minus
+                return (char) 0x207b; // minus
               }
 
               return (char) c;

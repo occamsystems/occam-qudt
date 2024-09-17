@@ -2,13 +2,14 @@ package com.occamsystems.qudt;
 
 import java.util.Objects;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public abstract class Unit {
   abstract String label();
+
   abstract String symbol();
+
   abstract String ucumCode();
+
   abstract DimensionVector dv();
 
   abstract double conversionMultiplier();
@@ -19,24 +20,19 @@ public abstract class Unit {
     return this == other || this.dv().equals(other.dv());
   }
 
-  /**
-   * This converts a raw value into a scaled value.
-   * For example, degF.scale(273.15) gives 32.
-   */
+  /** This converts a raw value into a scaled value. For example, degF.scale(273.15) gives 32. */
   double scale(double value) {
     return value * this.conversionMultiplier() - conversionOffset();
   }
 
-  /**
-   * This converts a scaled value into a raw value.
-   * For example, degF.unscale(32) gives 273.15.
-   */
+  /** This converts a scaled value into a raw value. For example, degF.unscale(32) gives 273.15. */
   double unscale(double value) {
     return (value + this.conversionOffset()) * this.conversionMultiplier();
   }
 
   public boolean equivalent(Unit other) {
-    return other != null && this.dv().equals(other.dv())
+    return other != null
+        && this.dv().equals(other.dv())
         && this.conversionMultiplier() == other.conversionMultiplier()
         && this.conversionOffset() == other.conversionOffset();
   }

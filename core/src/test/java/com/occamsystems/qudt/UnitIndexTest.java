@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 class UnitIndexTest {
 
   @Test
@@ -29,16 +27,25 @@ class UnitIndexTest {
     Assertions.assertTrue(literalUnits.contains(T_1Units.HZ.u));
     Assertions.assertFalse(literalUnits.contains(T_1Units.PER_SEC.u));
 
-    System.out.println(literalUnits.stream().map(u -> u.symbol() + "\t:\t" + u.ucumCode()).distinct().collect(Collectors.joining("\n")));
+    System.out.println(
+        literalUnits.stream()
+            .map(u -> u.symbol() + "\t:\t" + u.ucumCode())
+            .distinct()
+            .collect(Collectors.joining("\n")));
   }
 
   @Test
   void bestPredefinedMatch() {
     UnitIndex unitIndex = new UnitIndex();
     Assertions.assertEquals(L3Units.DeciM3.u, unitIndex.bestPredefinedMatch(L3Units.DeciM3.u));
-    Assertions.assertEquals(L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.DeciM.u, 3)));
-    Assertions.assertEquals(L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.M.u, 2, L1Units.MilliM.u, 1)));
-    Assertions.assertEquals(L1Units.DeciM.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L3Units.L.u, new SmallFraction(1, 3))));
+    Assertions.assertEquals(
+        L3Units.L.u, unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.DeciM.u, 3)));
+    Assertions.assertEquals(
+        L3Units.L.u,
+        unitIndex.bestPredefinedMatch(new AggregateUnit(L1Units.M.u, 2, L1Units.MilliM.u, 1)));
+    Assertions.assertEquals(
+        L1Units.DeciM.u,
+        unitIndex.bestPredefinedMatch(new AggregateUnit(L3Units.L.u, new SmallFraction(1, 3))));
   }
 
   @Test
@@ -56,7 +63,8 @@ class UnitIndexTest {
     Assertions.assertEquals(L3Units.L.u, unitIndex.predefinedUnitBySymbol("L"));
     Assertions.assertEquals(L1Units.M.u, unitIndex.predefinedUnitBySymbol("m"));
     Assertions.assertEquals(L1M1Units.KiloGM_M.u, unitIndex.predefinedUnitBySymbol("kg*m"));
-    Assertions.assertEquals(L1M1T_2Units.KiloGM_M_PER_SEC2.u, unitIndex.predefinedUnitBySymbol("kg*m/s2"));
+    Assertions.assertEquals(
+        L1M1T_2Units.KiloGM_M_PER_SEC2.u, unitIndex.predefinedUnitBySymbol("kg*m/s2"));
   }
 
   @Test

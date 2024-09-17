@@ -1,8 +1,6 @@
 package com.occamsystems.qudt;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public class LiteralUnit extends Unit {
 
   private String label;
@@ -13,8 +11,14 @@ public class LiteralUnit extends Unit {
   private double conversionOffset;
   private double conversionMultiplier;
 
-  public LiteralUnit(String label, String uri, String symbol, String ucumCode, DimensionVector dv,
-      double conversionOffset, double conversionMultiplier) {
+  public LiteralUnit(
+      String label,
+      String uri,
+      String symbol,
+      String ucumCode,
+      DimensionVector dv,
+      double conversionOffset,
+      double conversionMultiplier) {
     this.label = label;
     this.uri = uri;
     this.symbol = symbol;
@@ -63,35 +67,36 @@ public class LiteralUnit extends Unit {
   }
 
   public static final DimensionVector DIMENSION_VECTOR = DimensionVector.builder().build();
-  public static final Unit UNITLESS = new Unit() {
-    @Override
-    public String label() {
-      return "Unitless";
-    }
+  public static final Unit UNITLESS =
+      new Unit() {
+        @Override
+        public String label() {
+          return "Unitless";
+        }
 
-    @Override
-    public String symbol() {
-      return "";
-    }
+        @Override
+        public String symbol() {
+          return "";
+        }
 
-    @Override
-    public String ucumCode() {
-      return "";
-    }
+        @Override
+        public String ucumCode() {
+          return "";
+        }
 
-    @Override
-    public DimensionVector dv() {
-      return DIMENSION_VECTOR;
-    }
+        @Override
+        public DimensionVector dv() {
+          return DIMENSION_VECTOR;
+        }
 
-    @Override
-    public double conversionMultiplier() {
-      return 1;
-    }
+        @Override
+        public double conversionMultiplier() {
+          return 1;
+        }
 
-    @Override
-    public double conversionOffset() {
-      return 0;
-    }
-  };
+        @Override
+        public double conversionOffset() {
+          return 0;
+        }
+      };
 }

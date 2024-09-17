@@ -17,12 +17,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Copyright (c)  2024 Occam Systems, Inc.
- */
+/** Copyright (c) 2024 Occam Systems, Inc. */
 public class UnitIndex {
 
-  public static final Predicate<String> UCUM_COMPOSITE = Pattern.compile(".*[0-9³⁴√·\\./_-].*").asMatchPredicate();
+  public static final Predicate<String> UCUM_COMPOSITE =
+      Pattern.compile(".*[0-9³⁴√·\\./_-].*").asMatchPredicate();
   public static final Logger log = Logger.getLogger(UnitIndex.class.getName());
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
@@ -30,15 +29,17 @@ public class UnitIndex {
 
   private static final String SIMPLE_NUMBER_REGEX = "[-+]?\\d*(\\.\\d+)?";
   private static final String NUMBER_REGEX = SIMPLE_NUMBER_REGEX + "([eE][-+]?\\d+)?";
-  private static final String UNIT_REGEX = "(?<name>([^-+.\\d]+))(?<exponent>("+SIMPLE_NUMBER_REGEX+"))?";
+  private static final String UNIT_REGEX =
+      "(?<name>([^-+.\\d]+))(?<exponent>(" + SIMPLE_NUMBER_REGEX + "))?";
   private static final Pattern UNIT_PATTERN = Pattern.compile(UNIT_REGEX);
 
   private List<Unit> preferredUnits = new ArrayList<>(3);
 
   /**
    * Creates a new unit index.
+   *
    * @param preferredUnits Optionally specify units that should be preferentially selected in the
-   *                       case of ambiguity.
+   *     case of ambiguity.
    */
   public UnitIndex(Unit... preferredUnits) {
     this.preferredUnits.add(H1Units.K.u);
@@ -47,16 +48,19 @@ public class UnitIndex {
   }
 
   /**
-   * Returns a list of units that are neither powers nor explicit compositions of other units.
-   * For example, N and km are simple units, while m/s and m2 are not.
+   * Returns a list of units that are neither powers nor explicit compositions of other units. For
+   * example, N and km are simple units, while m/s and m2 are not.
    */
   List<LiteralUnit> simpleUnits() {
     if (simpleUnits == null) {
-      simpleUnits = Units.byDV.values().stream().flatMap(Arrays::stream)
-          .filter(unit -> !UCUM_COMPOSITE.test(unit.ucumCode()) &&
-              !UCUM_COMPOSITE.test(unit.symbol()))
-          .filter(unit -> !(unit.dv().isEmpty() && unit.conversionMultiplier() == 1.))
-          .toList();
+      simpleUnits =
+          Units.byDV.values().stream()
+              .flatMap(Arrays::stream)
+              .filter(
+                  unit ->
+                      !UCUM_COMPOSITE.test(unit.ucumCode()) && !UCUM_COMPOSITE.test(unit.symbol()))
+              .filter(unit -> !(unit.dv().isEmpty() && unit.conversionMultiplier() == 1.))
+              .toList();
     }
 
     return simpleUnits;
@@ -76,24 +80,52 @@ public class UnitIndex {
             boolean prefSu = this.preferredUnits.contains(simpleUnit);
             boolean prefPrev = this.preferredUnits.contains(prev);
 
-            int suQk = kindsByDimensionVector().getOrDefault(simpleUnit.dv(),
-                Collections.emptyList()).size();
-            int pQk = kindsByDimensionVector().getOrDefault(prev.dv(),
-                Collections.emptyList()).size();
+            int suQk =
+                kindsByDimensionVector()
+                    .getOrDefault(simpleUnit.dv(), Collections.emptyList())
+                    .size();
+            int pQk =
+                kindsByDimensionVector().getOrDefault(prev.dv(), Collections.emptyList()).size();
 
             if (prefSu && !prefPrev) {
-              log.fine("Explicitly resolve symbol collision on " + key + " = " + prev.label() + " and <" + simpleUnit.label() + ">");
+              log.fine(
+                  "Explicitly resolve symbol collision on "
+                      + key
+                      + " = "
+                      + prev.label()
+                      + " and <"
+                      + simpleUnit.label()
+                      + ">");
               simpleSymbolMap.put(key, simpleUnit);
             } else if (!prefSu && prefPrev) {
-              log.fine("Explicitly resolve symbol collision on " + key + " = <" + prev.label() + "> and " + simpleUnit.label());
+              log.fine(
+                  "Explicitly resolve symbol collision on "
+                      + key
+                      + " = <"
+                      + prev.label()
+                      + "> and "
+                      + simpleUnit.label());
             } else if (suQk > pQk) {
-                log.fine("Automatically resolve symbol collision on " + key + " = " + prev.label() + " and <" + simpleUnit.label() + ">");
-                simpleSymbolMap.put(key, simpleUnit);
-              } else {
-                log.fine("Automatically resolve symbol collision on " + key + " = <" + prev.label() + "> and " + simpleUnit.label());
-              }
+              log.fine(
+                  "Automatically resolve symbol collision on "
+                      + key
+                      + " = "
+                      + prev.label()
+                      + " and <"
+                      + simpleUnit.label()
+                      + ">");
+              simpleSymbolMap.put(key, simpleUnit);
+            } else {
+              log.fine(
+                  "Automatically resolve symbol collision on "
+                      + key
+                      + " = <"
+                      + prev.label()
+                      + "> and "
+                      + simpleUnit.label());
             }
-          } else {
+          }
+        } else {
           simpleSymbolMap.put(key, simpleUnit);
         }
       }
@@ -104,9 +136,10 @@ public class UnitIndex {
 
   public Map<DimensionVector, List<QuantityKind>> kindsByDimensionVector() {
     if (qkByDv == null) {
-      qkByDv = Arrays.stream(QuantityKinds.values())
-          .map(qke -> qke.qk)
-          .collect(Collectors.groupingBy(qk -> qk.dimensionVector));
+      qkByDv =
+          Arrays.stream(QuantityKinds.values())
+              .map(qke -> qke.qk)
+              .collect(Collectors.groupingBy(qk -> qk.dimensionVector));
     }
 
     return qkByDv;
@@ -114,24 +147,25 @@ public class UnitIndex {
 
   /**
    * If the unit is not already a LiteralUnit, returns the best matched unit from among predefined
-   * units.
-   * Match quality is defined as similarity of conversion multiplier, then symbolic concision.
-   * (e.g., L is preferred to dm3.)
-   * This will be null if and only if the dimension vector of the supplied unit has no
-   * predefined units.
+   * units. Match quality is defined as similarity of conversion multiplier, then symbolic
+   * concision. (e.g., L is preferred to dm3.) This will be null if and only if the dimension vector
+   * of the supplied unit has no predefined units.
    */
   LiteralUnit bestPredefinedMatch(Unit base) {
     if (base instanceof LiteralUnit lu) {
       return lu;
     }
 
-    LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[]{});
+    LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[] {});
 
     double baseConvLog = Math.log(base.conversionMultiplier());
     return Arrays.stream(matches)
-        .sorted(Comparator.comparing(u -> Math.abs(Math.log(((Unit) u).conversionMultiplier()) - baseConvLog))
-        .thenComparing(u -> ((Unit) u).symbol().length()))
-        .findFirst().orElse(null);
+        .sorted(
+            Comparator.comparing(
+                    u -> Math.abs(Math.log(((Unit) u).conversionMultiplier()) - baseConvLog))
+                .thenComparing(u -> ((Unit) u).symbol().length()))
+        .findFirst()
+        .orElse(null);
   }
 
   public static String toKeyboardChars(String symbol) {
@@ -155,7 +189,7 @@ public class UnitIndex {
                 return "ohm";
               } else if (((int) '℧') == c) {
                 return "mho";
-              } else if (((int) 'μ') == c || (((int)'µ') == c)){
+              } else if (((int) 'μ') == c || (((int) 'µ') == c)) {
                 return 'u';
               } else if (((int) 'χ') == c) {
                 return "chi";
@@ -179,11 +213,11 @@ public class UnitIndex {
             })
         .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
         .toString();
-
   }
 
   LiteralUnit predefinedUnitBySymbol(String symbol) {
-    return Units.byDV.values().stream().flatMap(Arrays::stream)
+    return Units.byDV.values().stream()
+        .flatMap(Arrays::stream)
         .filter(u -> u.symbol().equals(symbol) || toKeyboardChars(u.symbol()).equals(symbol))
         .sorted(this::preferredUnit)
         .findFirst()
@@ -201,10 +235,8 @@ public class UnitIndex {
       return 1;
     }
 
-    int suQk = kindsByDimensionVector().getOrDefault(u1.dv(),
-        Collections.emptyList()).size();
-    int pQk = kindsByDimensionVector().getOrDefault(u2.dv(),
-        Collections.emptyList()).size();
+    int suQk = kindsByDimensionVector().getOrDefault(u1.dv(), Collections.emptyList()).size();
+    int pQk = kindsByDimensionVector().getOrDefault(u2.dv(), Collections.emptyList()).size();
 
     if (suQk != pQk) {
       return suQk - pQk;
@@ -225,8 +257,7 @@ public class UnitIndex {
 
         b = new StringBuilder();
         negative = chars[i] == '/';
-      }
-      else {
+      } else {
         b.append(chars[i]);
 
         if (i == chars.length - 1) {
@@ -238,8 +269,8 @@ public class UnitIndex {
     return aggregateUnit;
   }
 
-  private AggregateUnit parseUnitExponent(boolean negative, StringBuilder b,
-      AggregateUnit aggregateUnit) {
+  private AggregateUnit parseUnitExponent(
+      boolean negative, StringBuilder b, AggregateUnit aggregateUnit) {
     Matcher matcher = UNIT_PATTERN.matcher(b.toString());
 
     if (matcher.find()) {
