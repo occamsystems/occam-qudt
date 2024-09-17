@@ -22,7 +22,7 @@ public abstract class Unit {
 
   /** This converts a raw value into a scaled value. For example, degF.scale(273.15) gives 32. */
   double scale(double value) {
-    return value * this.conversionMultiplier() - conversionOffset();
+    return value / this.conversionMultiplier() - conversionOffset();
   }
 
   /** This converts a scaled value into a raw value. For example, degF.unscale(32) gives 273.15. */
