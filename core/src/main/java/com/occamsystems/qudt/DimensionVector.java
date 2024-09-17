@@ -150,7 +150,6 @@ public class DimensionVector {
     private SmallFraction mass = SmallFraction.ZERO;
     private SmallFraction thermodynamicTemperature = SmallFraction.ZERO;
     private SmallFraction time = SmallFraction.ZERO;
-    private SmallFraction dimensionless = SmallFraction.ZERO;
 
     public Builder withAmountOfSubstance(int i) {
       return withAmountOfSubstance(new SmallFraction(i));
@@ -212,15 +211,6 @@ public class DimensionVector {
 
     public Builder withTime(SmallFraction time) {
       this.time = time;
-      return this;
-    }
-
-    public Builder withDimensionless(int i) {
-      return withDimensionless(new SmallFraction(i));
-    }
-
-    public Builder withDimensionless(SmallFraction dimensionless) {
-      this.dimensionless = dimensionless;
       return this;
     }
 
