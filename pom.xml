@@ -9,8 +9,8 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>cache-gen</module>
-    <module>core</module>
+    <module>qudt-cache-gen</module>
+    <module>qudt-core</module>
   </modules>
 
   <properties>
