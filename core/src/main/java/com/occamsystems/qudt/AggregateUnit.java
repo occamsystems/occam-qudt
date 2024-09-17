@@ -46,7 +46,7 @@ public class AggregateUnit extends Unit {
     if (unit1 instanceof LiteralUnit lu) {
       components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, i1));
       components.computeIfAbsent(lu, u -> i1);
-    } else if (unit instanceof AggregateUnit agg) {
+    } else if (unit1 instanceof AggregateUnit agg) {
       agg.components.forEach(
           (lu, lui) -> {
             SmallFraction sf = SmallFraction.times(lui, i1).reduce();
@@ -54,6 +54,33 @@ public class AggregateUnit extends Unit {
             components.putIfAbsent(lu, sf);
           });
     }
+
+    List<LiteralUnit> zeroes =
+        this.components.entrySet().stream()
+            .filter(e -> e.getValue().isZero())
+            .map(Entry::getKey)
+            .toList();
+
+    zeroes.forEach(this.components::remove);
+  }
+
+  public AggregateUnit(Map<Unit, SmallFraction> unitMap) {
+    components = new HashMap<>(5);
+
+    unitMap.forEach(
+        (unit1, i1) -> {
+          if (unit1 instanceof LiteralUnit lu) {
+            components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, i1));
+            components.computeIfAbsent(lu, u -> i1);
+          } else if (unit1 instanceof AggregateUnit agg) {
+            agg.components.forEach(
+                (lu, lui) -> {
+                  SmallFraction sf = SmallFraction.times(lui, i1).reduce();
+                  components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, sf));
+                  components.putIfAbsent(lu, sf);
+                });
+          }
+        });
 
     List<LiteralUnit> zeroes =
         this.components.entrySet().stream()
