@@ -15,6 +15,7 @@ public class SmallFraction extends Number {
 
   public static SmallFraction ZERO = new SmallFraction(0, 1);
   public static SmallFraction ONE = new SmallFraction(1);
+  public static SmallFraction NEG_ONE = new SmallFraction(-1);
   private int num;
   private int denom;
 

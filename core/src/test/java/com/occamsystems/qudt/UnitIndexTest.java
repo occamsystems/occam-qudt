@@ -1,5 +1,6 @@
 package com.occamsystems.qudt;
 
+import com.occamsystems.qudt.predefined.units.A1Units;
 import com.occamsystems.qudt.predefined.units.H1Units;
 import com.occamsystems.qudt.predefined.units.L1M1T_2Units;
 import com.occamsystems.qudt.predefined.units.L1M1Units;
@@ -8,7 +9,6 @@ import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,12 +26,6 @@ class UnitIndexTest {
     Assertions.assertFalse(literalUnits.contains(L3Units.CentiM3.u));
     Assertions.assertTrue(literalUnits.contains(T_1Units.HZ.u));
     Assertions.assertFalse(literalUnits.contains(T_1Units.PER_SEC.u));
-
-    System.out.println(
-        literalUnits.stream()
-            .map(u -> u.symbol() + "\t:\t" + u.ucumCode())
-            .distinct()
-            .collect(Collectors.joining("\n")));
   }
 
   @Test
@@ -76,5 +70,29 @@ class UnitIndexTest {
     AggregateUnit kgms_2 = unitIndex.parseAsAggregateUnit("kg*m/s2");
     Assertions.assertTrue(L1M1T_2Units.KiloGM_M_PER_SEC2.u.equivalent(kgms_2));
     Assertions.assertEquals("kg⋅m⋅s⁻²", kgms_2.symbol());
+  }
+
+  @Test
+  void parseQuantity() {
+    UnitIndex unitIndex = new UnitIndex();
+    QuantityValue quantityValue = unitIndex.parseQuantity("18.3 kN");
+    Assertions.assertEquals(L1M1T_2Units.KiloN.u, quantityValue.unit);
+    Assertions.assertEquals(18.3, quantityValue.value());
+    Assertions.assertEquals(18300, quantityValue.unscaled);
+
+    quantityValue = unitIndex.parseQuantity("3e5mL/mol/K");
+    AggregateUnit builtUnit =
+        new AggregateUnit(
+            Map.of(
+                L3Units.MilliL.u,
+                SmallFraction.ONE,
+                A1Units.MOL.u,
+                SmallFraction.NEG_ONE,
+                H1Units.K.u,
+                SmallFraction.NEG_ONE));
+
+    Assertions.assertEquals(builtUnit, quantityValue.unit);
+    Assertions.assertEquals(3e5, quantityValue.value());
+    Assertions.assertEquals(0.3, quantityValue.unscaled);
   }
 }

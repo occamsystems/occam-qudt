@@ -2,6 +2,7 @@ package com.occamsystems.qudt;
 
 import com.occamsystems.qudt.predefined.QuantityKinds;
 import com.occamsystems.qudt.predefined.Units;
+import com.occamsystems.qudt.predefined.units.D1Units;
 import com.occamsystems.qudt.predefined.units.H1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import java.util.ArrayList;
@@ -26,12 +27,17 @@ public class UnitIndex {
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
+  private Map<String, List<LiteralUnit>> runtimeUnits = new HashMap<>();
 
   private static final String SIMPLE_NUMBER_REGEX = "[-+]?\\d*(\\.\\d+)?";
   private static final String NUMBER_REGEX = SIMPLE_NUMBER_REGEX + "([eE][-+]?\\d+)?";
   private static final String UNIT_REGEX =
       "(?<name>([^-+.\\d]+))(?<exponent>(" + SIMPLE_NUMBER_REGEX + "))?";
   private static final Pattern UNIT_PATTERN = Pattern.compile(UNIT_REGEX);
+
+  private static final String QTY_REGEX = "(?<value>(" + NUMBER_REGEX + "))( )*(?<unit>(.*))";
+
+  private static final Pattern QTY_PATTERN = Pattern.compile(QTY_REGEX);
 
   private List<Unit> preferredUnits = new ArrayList<>(3);
 
@@ -289,5 +295,32 @@ public class UnitIndex {
       aggregateUnit = new AggregateUnit(aggregateUnit, SmallFraction.ONE, literalUnit, exp);
     }
     return aggregateUnit;
+  }
+
+  public QuantityValue parseQuantity(String qtyString) {
+    Matcher matcher = QTY_PATTERN.matcher(qtyString);
+    if (matcher.find()) {
+      String valueString = matcher.group("value");
+      String unitString = matcher.group("unit");
+      Unit unit;
+      if (unitString.isBlank()) {
+        unit = D1Units.UNITLESS.u;
+      } else {
+        unit = this.predefinedUnitBySymbol(unitString);
+
+        if (unit == null) {
+          unit = this.parseAsAggregateUnit(unitString);
+        }
+      }
+      return QuantityValue.ofScaled(Double.parseDouble(valueString), unit);
+    }
+
+    return null;
+  }
+
+  public void registerUnit(LiteralUnit unit) {
+    List<LiteralUnit> list =
+        this.runtimeUnits.computeIfAbsent(unit.dv().indexCode(), k -> new ArrayList<>());
+    list.add(unit);
   }
 }
