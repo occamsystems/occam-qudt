@@ -65,38 +65,4 @@ public class LiteralUnit extends Unit {
   public double conversionOffset() {
     return this.conversionOffset;
   }
-
-  public static final DimensionVector DIMENSION_VECTOR = DimensionVector.builder().build();
-  public static final Unit UNITLESS =
-      new Unit() {
-        @Override
-        public String label() {
-          return "Unitless";
-        }
-
-        @Override
-        public String symbol() {
-          return "";
-        }
-
-        @Override
-        public String ucumCode() {
-          return "";
-        }
-
-        @Override
-        public DimensionVector dv() {
-          return DIMENSION_VECTOR;
-        }
-
-        @Override
-        public double conversionMultiplier() {
-          return 1;
-        }
-
-        @Override
-        public double conversionOffset() {
-          return 0;
-        }
-      };
 }
