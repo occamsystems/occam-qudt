@@ -1,5 +1,7 @@
 package com.occamsystems.qudt;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 public class AggregateUnit extends Unit{
   Map<LiteralUnit, SmallFraction> components;
 
+  public static AggregateUnit empty = new AggregateUnit(null, 0);
+
   public AggregateUnit(Unit unit, int i) {
     this(unit, new SmallFraction(i));
   }
@@ -23,21 +27,27 @@ public class AggregateUnit extends Unit{
       components = new HashMap<>(agg.components.size());
 
       agg.components.forEach((lu, lui) -> components.put(lu, SmallFraction.times(lui, i).reduce()));
+    } else {
+      components = Collections.emptyMap();
     }
   }
 
   public AggregateUnit(Unit unit, int i, Unit unit1, int i1) {
+    this(unit, new SmallFraction(i), unit1, new SmallFraction(i1));
+  }
+
+  public AggregateUnit(Unit unit, SmallFraction i, Unit unit1, SmallFraction i1) {
     components = new HashMap<>(5);
 
     if (unit instanceof LiteralUnit lu) {
-      components.put(lu, new SmallFraction(i));
+      components.put(lu, i);
     } else if (unit instanceof AggregateUnit agg) {
       agg.components.forEach((lu, lui) -> components.put(lu, SmallFraction.times(lui, i).reduce()));
     }
 
     if (unit1 instanceof LiteralUnit lu) {
       components.computeIfPresent(lu, (u, prev) -> SmallFraction.plus(prev, i1));
-      components.computeIfAbsent(lu, u -> new SmallFraction(i1));
+      components.computeIfAbsent(lu, u -> i1);
     } else if (unit instanceof AggregateUnit agg) {
       agg.components.forEach((lu, lui) -> {
         SmallFraction sf = SmallFraction.times(lui, i1).reduce();
@@ -62,7 +72,14 @@ public class AggregateUnit extends Unit{
   @Override
   public String symbol() {
     return this.components.entrySet().stream()
-        .map(e -> e.getKey().symbol() + numbersToSuperscript(e.getValue().toDecimalString()))
+        .sorted(Comparator.comparing(e -> -e.getValue().floatValue()))
+        .map(e -> {
+          if (e.getValue().isOne()) {
+            return e.getKey().symbol();
+          }
+
+          return e.getKey().symbol() + numbersToSuperscript(e.getValue().toDecimalString());
+        })
         .collect(Collectors.joining("⋅"));
   }
 

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,11 @@ public class UnitIndex {
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
+
+  private static final String SIMPLE_NUMBER_REGEX = "[-+]?\\d*(\\.\\d+)?";
+  private static final String NUMBER_REGEX = SIMPLE_NUMBER_REGEX + "([eE][-+]?\\d+)?";
+  private static final String UNIT_REGEX = "(?<name>([^-+.\\d]+))(?<exponent>("+SIMPLE_NUMBER_REGEX+"))?";
+  private static final Pattern UNIT_PATTERN = Pattern.compile(UNIT_REGEX);
 
   private List<Unit> preferredUnits = new ArrayList<>(3);
 
@@ -76,15 +82,15 @@ public class UnitIndex {
                 Collections.emptyList()).size();
 
             if (prefSu && !prefPrev) {
-              log.info("Explicitly resolve symbol collision on " + key + " = " + prev.label() + " and <" + simpleUnit.label() + ">");
+              log.fine("Explicitly resolve symbol collision on " + key + " = " + prev.label() + " and <" + simpleUnit.label() + ">");
               simpleSymbolMap.put(key, simpleUnit);
             } else if (!prefSu && prefPrev) {
-              log.info("Explicitly resolve symbol collision on " + key + " = <" + prev.label() + "> and " + simpleUnit.label());
+              log.fine("Explicitly resolve symbol collision on " + key + " = <" + prev.label() + "> and " + simpleUnit.label());
             } else if (suQk > pQk) {
-                log.info("Automatically resolve symbol collision on " + key + " = " + prev.label() + " and <" + simpleUnit.label() + ">");
+                log.fine("Automatically resolve symbol collision on " + key + " = " + prev.label() + " and <" + simpleUnit.label() + ">");
                 simpleSymbolMap.put(key, simpleUnit);
               } else {
-                log.info("Automatically resolve symbol collision on " + key + " = <" + prev.label() + "> and " + simpleUnit.label());
+                log.fine("Automatically resolve symbol collision on " + key + " = <" + prev.label() + "> and " + simpleUnit.label());
               }
             }
           } else {
@@ -205,5 +211,52 @@ public class UnitIndex {
     }
 
     return u1.hashCode() - u2.hashCode();
+  }
+
+  public AggregateUnit parseAsAggregateUnit(String symbol) {
+    String s = toKeyboardChars(symbol);
+    boolean negative = false;
+    char[] chars = s.toCharArray();
+    StringBuilder b = new StringBuilder();
+    AggregateUnit aggregateUnit = AggregateUnit.empty;
+    for (int i = 0; i < chars.length; i++) {
+      if (chars[i] == '/' || chars[i] == '*') {
+        aggregateUnit = parseUnitExponent(negative, b, aggregateUnit);
+
+        b = new StringBuilder();
+        negative = chars[i] == '/';
+      }
+      else {
+        b.append(chars[i]);
+
+        if (i == chars.length - 1) {
+          aggregateUnit = parseUnitExponent(negative, b, aggregateUnit);
+        }
+      }
+    }
+
+    return aggregateUnit;
+  }
+
+  private AggregateUnit parseUnitExponent(boolean negative, StringBuilder b,
+      AggregateUnit aggregateUnit) {
+    Matcher matcher = UNIT_PATTERN.matcher(b.toString());
+
+    if (matcher.find()) {
+      String name = matcher.group("name");
+      String exponent = matcher.group("exponent");
+      SmallFraction exp = SmallFraction.ONE;
+      if (exponent != null && !exponent.isBlank()) {
+        exp = SmallFraction.approximate(Double.parseDouble(exponent));
+      }
+
+      if (negative) {
+        exp = SmallFraction.times(exp, -1);
+      }
+
+      LiteralUnit literalUnit = this.simpleSymbolMap().get(name);
+      aggregateUnit = new AggregateUnit(aggregateUnit, SmallFraction.ONE, literalUnit, exp);
+    }
+    return aggregateUnit;
   }
 }
