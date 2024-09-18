@@ -8,6 +8,7 @@ public class DimensionVector {
   public static final DimensionVector DIMENSIONLESS = DimensionVector.builder().build();
   public static final String DIMENSIONLESS_NAME = "A0E0L0I0M0H0T0D1";
   public static final String DIMENSIONLESS_CODE = "D1";
+  public static final String QKDV = "http://qudt.org/vocab/dimensionvector/";
   private final SmallFraction[] vector = new SmallFraction[7];
   public static final int amountOfSubstance = 0;
   public static final int electricCurrent = 1;
@@ -21,6 +22,25 @@ public class DimensionVector {
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public DimensionVector(String uri) {
+    String[] names = uri.split(QKDV);
+    String localName = names[names.length - 1];
+    String regex = "[AELIMHTD]";
+    String[] split = localName.split(regex);
+    int[] array = new int[14];
+    if (split.length >= 9) {
+      for (int i = 0; i < 7; i++) {
+        String expStr = split[i + 1];
+        String numStr = expStr.replaceAll("[(dot)(pt)]", ".");
+        this.vector[i] = SmallFraction.approximate(Double.parseDouble(numStr));
+      }
+    } else {
+      for (int i = 0; i < 7; i++) {
+        this.vector[i] = SmallFraction.ZERO;
+      }
+    }
   }
 
   public DimensionVector(int[] numDenomArray) {
@@ -83,6 +103,10 @@ public class DimensionVector {
       scaled[i] = SmallFraction.times(this.vector[i], value);
     }
     return new DimensionVector(scaled);
+  }
+
+  public String uri() {
+    return QKDV + localName();
   }
 
   public String localName() {
