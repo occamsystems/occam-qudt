@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -152,12 +153,103 @@ public class UnitIndex {
   }
 
   /**
+   * Demands a LiteralUnit whose definition exactly matches the provided unit, follwing the logic
+   * for exactMatch. If no such LiteralUnit exists, one will be created from the Aggregate returned
+   * by exactMatch.
+   */
+  public LiteralUnit demandExactLiteral(Unit base, String namespace) {
+    if (base instanceof LiteralUnit lu) {
+      return lu;
+    }
+
+    Optional<LiteralUnit> match = this.exactMatch(base);
+
+    if (match.isPresent()) {
+      return match.get();
+    }
+
+    AggregateUnit unit = this.decomposeAsAggregate(base);
+
+    LiteralUnit literalUnit =
+        new LiteralUnit(
+            unit.label(),
+            namespace + toKeyboardChars(unit.symbol()),
+            unit.symbol(),
+            unit.ucumCode(),
+            unit.dv(),
+            unit.conversionOffset(),
+            unit.conversionMultiplier());
+
+    this.registerUnit(literalUnit);
+    return literalUnit;
+  }
+
+  /**
+   * Demands a LiteralUnit whose definition exactly matches the provided symbol, follwing the logic
+   * for exactMatch. If no such LiteralUnit exists, one will be created from the Aggregate returned
+   * by exactMatch.
+   */
+  public LiteralUnit demandExactLiteral(String symbol, String namespace) {
+    Unit unit = this.exactMatch(symbol);
+
+    if (unit instanceof LiteralUnit lu) {
+      return lu;
+    }
+
+    LiteralUnit literalUnit =
+        new LiteralUnit(
+            unit.label(),
+            namespace + toKeyboardChars(unit.symbol()),
+            unit.symbol(),
+            unit.ucumCode(),
+            unit.dv(),
+            unit.conversionOffset(),
+            unit.conversionMultiplier());
+
+    this.registerUnit(literalUnit);
+    return literalUnit;
+  }
+
+  /**
+   * Finds a unit whose definition exactly matches the provided symbol. This does not necessarily
+   * mean that symbol of the returned unit will be exactly the provided symbol.
+   */
+  public Unit exactMatch(String symbol) {
+    AggregateUnit aggregateUnit = parseAsAggregateUnit(symbol);
+    Optional<LiteralUnit> literalUnit = exactMatch(aggregateUnit);
+    if (literalUnit.isPresent()) {
+      return literalUnit.get();
+    } else {
+      return aggregateUnit;
+    }
+  }
+
+  /**
+   * Returns a literal unit whose dimension vector and conversion exactly match the base unit. If
+   * the base unit is already a LiteralUnit, it will just return the base unit.
+   */
+  public Optional<LiteralUnit> exactMatch(Unit base) {
+    if (base instanceof LiteralUnit lu) {
+      return Optional.of(lu);
+    }
+
+    LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[] {});
+
+    double cm = base.conversionMultiplier();
+    double co = base.conversionOffset();
+    return Arrays.stream(matches)
+        .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
+        .sorted(Comparator.comparing(u -> ((Unit) u).symbol().length()))
+        .findFirst();
+  }
+
+  /**
    * If the unit is not already a LiteralUnit, returns the best matched unit from among predefined
    * units. Match quality is defined as similarity of conversion multiplier, then symbolic
    * concision. (e.g., L is preferred to dm3.) This will be null if and only if the dimension vector
    * of the supplied unit has no predefined units.
    */
-  LiteralUnit bestPredefinedMatch(Unit base) {
+  public LiteralUnit bestPredefinedMatch(Unit base) {
     if (base instanceof LiteralUnit lu) {
       return lu;
     }
@@ -221,7 +313,7 @@ public class UnitIndex {
         .toString();
   }
 
-  LiteralUnit predefinedUnitBySymbol(String symbol) {
+  public LiteralUnit predefinedUnitBySymbol(String symbol) {
     return Units.byDV.values().stream()
         .flatMap(Arrays::stream)
         .filter(u -> u.symbol().equals(symbol) || toKeyboardChars(u.symbol()).equals(symbol))
@@ -249,6 +341,17 @@ public class UnitIndex {
     }
 
     return u1.hashCode() - u2.hashCode();
+  }
+
+  public AggregateUnit decomposeAsAggregate(Unit unit) {
+    if (unit instanceof LiteralUnit lu) {
+      return parseAsAggregateUnit(lu.symbol());
+    } else {
+      AggregateUnit agg = (AggregateUnit) unit;
+      Map<Unit, SmallFraction> map = new HashMap<>();
+      agg.components.forEach((lu, exp) -> map.put(decomposeAsAggregate(lu), exp));
+      return new AggregateUnit(map);
+    }
   }
 
   public AggregateUnit parseAsAggregateUnit(String symbol) {
@@ -306,11 +409,7 @@ public class UnitIndex {
       if (unitString.isBlank()) {
         unit = D1Units.UNITLESS.u;
       } else {
-        unit = this.predefinedUnitBySymbol(unitString);
-
-        if (unit == null) {
-          unit = this.parseAsAggregateUnit(unitString);
-        }
+        unit = this.exactMatch(unitString);
       }
       return QuantityValue.ofScaled(Double.parseDouble(valueString), unit);
     }
