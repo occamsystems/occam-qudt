@@ -16,6 +16,14 @@ public abstract class Unit {
 
   public abstract double conversionOffset();
 
+  public boolean isBasicNumber() {
+    return this.conversionMultiplier() == 1. && this.dv().dimensionless();
+  }
+
+  public boolean isNumber() {
+    return this.dv().dimensionless();
+  }
+
   public boolean isConvertible(Unit other) {
     return this == other || this.dv().equals(other.dv());
   }
