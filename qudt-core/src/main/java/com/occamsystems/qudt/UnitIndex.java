@@ -25,8 +25,8 @@ import java.util.stream.Stream;
 /** Copyright (c) 2024 Occam Systems, Inc. */
 public class UnitIndex {
 
-  public static final Predicate<String> UCUM_COMPOSITE =
-      Pattern.compile(".*[0-9³⁴√·\\./_-].*").asMatchPredicate();
+  public static final Predicate<String> TEST_COMPOSITE =
+      Pattern.compile(".*[0-9\\*/].*").asMatchPredicate();
   public static final Logger log = Logger.getLogger(UnitIndex.class.getName());
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
@@ -66,9 +66,7 @@ public class UnitIndex {
       simpleUnits =
           Units.byDV.values().stream()
               .flatMap(Arrays::stream)
-              .filter(
-                  unit ->
-                      !UCUM_COMPOSITE.test(unit.ucumCode()) && !UCUM_COMPOSITE.test(unit.symbol()))
+              .filter(unit -> !TEST_COMPOSITE.test(toKeyboardChars(unit.symbol())))
               .filter(unit -> !(unit.dv().isEmpty() && unit.conversionMultiplier() == 1.))
               .toList();
     }

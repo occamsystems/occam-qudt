@@ -26,6 +26,7 @@ class UnitIndexTest {
     Assertions.assertFalse(literalUnits.contains(L3Units.CentiM3.u));
     Assertions.assertTrue(literalUnits.contains(T_1Units.HZ.u));
     Assertions.assertFalse(literalUnits.contains(T_1Units.PER_SEC.u));
+    Assertions.assertTrue(literalUnits.contains(L1Units.YD.u));
   }
 
   @Test
