@@ -43,13 +43,13 @@ public class QuantityValue implements Comparable<QuantityValue> {
   }
 
   public static QuantityValue add(QuantityValue qv1, QuantityValue qv2) {
-    assert qv1.unit.isConvertable(qv2.unit);
+    assert qv1.unit.isConvertible(qv2.unit);
 
     return new QuantityValue(qv1.unscaled + qv2.unscaled, qv1.unit);
   }
 
   public static QuantityValue subtract(QuantityValue qv1, QuantityValue qv2) {
-    assert qv1.unit.isConvertable(qv2.unit);
+    assert qv1.unit.isConvertible(qv2.unit);
 
     return new QuantityValue(qv1.unscaled - qv2.unscaled, qv1.unit);
   }
@@ -79,7 +79,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   @Override
   public int compareTo(QuantityValue o) {
-    if (this.unit.isConvertable(o.unit)) {
+    if (this.unit.isConvertible(o.unit)) {
       return Double.compare(this.unscaled, o.unscaled);
     }
 
@@ -95,7 +95,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
       return false;
     }
     QuantityValue that = (QuantityValue) o;
-    return Double.compare(that.unscaled, unscaled) == 0 && unit.isConvertable(that.unit);
+    return Double.compare(that.unscaled, unscaled) == 0 && unit.isConvertible(that.unit);
   }
 
   @Override
