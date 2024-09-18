@@ -8,6 +8,18 @@ public class QuantityKind {
 
   QuantityKind[] broaderKinds;
 
+  public String label() {
+    return label;
+  }
+
+  public DimensionVector dimensionVector() {
+    return dimensionVector;
+  }
+
+  public QuantityKind[] broaderKinds() {
+    return broaderKinds;
+  }
+
   public QuantityKind(
       String label, String uri, DimensionVector dimensionVector, QuantityKind... broaderKinds) {
     this.uri = uri;
