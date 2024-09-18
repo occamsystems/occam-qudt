@@ -25,6 +25,14 @@ public class QuantityValue implements Comparable<QuantityValue> {
     this.unit = unit;
   }
 
+  public double unscaled() {
+    return unscaled;
+  }
+
+  public Unit unit() {
+    return unit;
+  }
+
   public double value() {
     return this.unit.scale(unscaled);
   }
