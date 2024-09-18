@@ -54,4 +54,9 @@ public abstract class Unit {
   public boolean equals(Object obj) {
     return obj instanceof Unit && obj.hashCode() == this.hashCode();
   }
+
+  @Override
+  public String toString() {
+    return symbol();
+  }
 }
