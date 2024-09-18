@@ -5,6 +5,8 @@ import java.util.Objects;
 
 /** Copyright (c) 2024 Occam Systems, Inc. */
 public class QuantityValue implements Comparable<QuantityValue> {
+
+  public static final double EPSILON = 0.00001;
   double unscaled;
   Unit unit;
 
@@ -35,6 +37,12 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   public double value() {
     return this.unit.scale(unscaled);
+  }
+
+  public static QuantityValue converted(QuantityValue qv, Unit u) {
+    assert qv.unit().isConvertible(u);
+
+    return QuantityValue.ofUnscaled(qv.unscaled, u);
   }
 
   public static QuantityValue divide(QuantityValue qv1, QuantityValue qv2) {
@@ -80,6 +88,10 @@ public class QuantityValue implements Comparable<QuantityValue> {
   @Override
   public int compareTo(QuantityValue o) {
     if (this.unit.isConvertible(o.unit)) {
+      if (Math.abs(1 - (this.unscaled / o.unscaled)) < EPSILON) {
+        return 0;
+      }
+
       return Double.compare(this.unscaled, o.unscaled);
     }
 
