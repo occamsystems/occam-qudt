@@ -20,7 +20,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
     return new QuantityValue(value, unit);
   }
 
-  private QuantityValue(double unscaled, Unit unit) {
+  protected QuantityValue(double unscaled, Unit unit) {
     this.unscaled = unscaled;
     this.unit = unit;
   }
