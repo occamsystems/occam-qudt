@@ -51,12 +51,28 @@ public class QuantityValue implements Comparable<QuantityValue> {
   }
 
   public static QuantityValue add(QuantityValue qv1, QuantityValue qv2) {
+    if (qv1.unscaled == 0.) {
+      return qv2;
+    }
+
+    if (qv2.unscaled == 0.) {
+      return qv1;
+    }
+
     assert qv1.unit.isConvertible(qv2.unit);
 
     return new QuantityValue(qv1.unscaled + qv2.unscaled, qv1.unit);
   }
 
   public static QuantityValue subtract(QuantityValue qv1, QuantityValue qv2) {
+    if (qv1.unscaled == 0.) {
+      return QuantityValue.ofUnscaled(-qv2.value(), qv2.unit());
+    }
+
+    if (qv2.unscaled == 0.) {
+      return qv1;
+    }
+
     assert qv1.unit.isConvertible(qv2.unit);
 
     return new QuantityValue(qv1.unscaled - qv2.unscaled, qv1.unit);
