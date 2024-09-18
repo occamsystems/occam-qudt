@@ -7,9 +7,11 @@ import com.occamsystems.qudt.predefined.units.H1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** Copyright (c) 2024 Occam Systems, Inc. */
 public class UnitIndex {
@@ -28,7 +31,7 @@ public class UnitIndex {
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
-  private Map<String, List<LiteralUnit>> runtimeUnits = new HashMap<>();
+  private Map<String, Collection<LiteralUnit>> runtimeUnits = new HashMap<>();
 
   private static final String SIMPLE_NUMBER_REGEX = "[-+]?\\d*(\\.\\d+)?";
   private static final String NUMBER_REGEX = SIMPLE_NUMBER_REGEX + "([eE][-+]?\\d+)?";
@@ -234,10 +237,12 @@ public class UnitIndex {
     }
 
     LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[] {});
+    Collection<LiteralUnit> runtimeMatches =
+        this.runtimeUnits.getOrDefault(base.dv().indexCode(), Collections.emptyList());
 
     double cm = base.conversionMultiplier();
     double co = base.conversionOffset();
-    return Arrays.stream(matches)
+    return Stream.concat(Arrays.stream(matches), runtimeMatches.stream())
         .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
         .sorted(Comparator.comparing(u -> ((Unit) u).symbol().length()))
         .findFirst();
@@ -255,9 +260,11 @@ public class UnitIndex {
     }
 
     LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[] {});
+    Collection<LiteralUnit> runtimeMatches =
+        this.runtimeUnits.getOrDefault(base.dv().indexCode(), Collections.emptyList());
 
     double baseConvLog = Math.log(base.conversionMultiplier());
-    return Arrays.stream(matches)
+    return Stream.concat(Arrays.stream(matches), runtimeMatches.stream())
         .sorted(
             Comparator.comparing(
                     u -> Math.abs(Math.log(((Unit) u).conversionMultiplier()) - baseConvLog))
@@ -313,9 +320,14 @@ public class UnitIndex {
         .toString();
   }
 
+  public Stream<LiteralUnit> units() {
+    return Stream.concat(
+        Units.byDV.values().stream().flatMap(Arrays::stream),
+        this.runtimeUnits.values().stream().flatMap(Collection::stream));
+  }
+
   public LiteralUnit predefinedUnitBySymbol(String symbol) {
-    return Units.byDV.values().stream()
-        .flatMap(Arrays::stream)
+    return this.units()
         .filter(u -> u.symbol().equals(symbol) || toKeyboardChars(u.symbol()).equals(symbol))
         .sorted(this::preferredUnit)
         .findFirst()
@@ -418,8 +430,12 @@ public class UnitIndex {
   }
 
   public void registerUnit(LiteralUnit unit) {
-    List<LiteralUnit> list =
-        this.runtimeUnits.computeIfAbsent(unit.dv().indexCode(), k -> new ArrayList<>());
+    Collection<LiteralUnit> list =
+        this.runtimeUnits.computeIfAbsent(unit.dv().indexCode(), k -> new HashSet<>());
     list.add(unit);
+  }
+
+  public Optional<LiteralUnit> unitByUri(String uri) {
+    return units().filter(u -> uri.equals(u.uri())).findAny();
   }
 }
