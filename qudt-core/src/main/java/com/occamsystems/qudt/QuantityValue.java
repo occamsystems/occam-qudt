@@ -99,6 +99,10 @@ public class QuantityValue implements Comparable<QuantityValue> {
         qv1.unscaled / qv2.unscaled, new AggregateUnit(qv1.unit, 1, qv2.unit, -1));
   }
 
+  public static QuantityValue divide(QuantityValue qv1, double d) {
+    return new QuantityValue(qv1.unscaled / d, qv1.unit);
+  }
+
   public static QuantityValue add(QuantityValue qv1, QuantityValue qv2) {
     if (qv1.unscaled == 0.) {
       return qv2;
@@ -138,6 +142,10 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   public static QuantityValue pow(QuantityValue qv1, int powNum, int powDenom) {
     return QuantityValue.pow(qv1, new SmallFraction(powNum, powDenom));
+  }
+
+  public static QuantityValue multiply(QuantityValue qv1, double d) {
+    return new QuantityValue(qv1.unscaled * d, qv1.unit);
   }
 
   public static QuantityValue multiply(QuantityValue qv1, QuantityValue qv2) {
