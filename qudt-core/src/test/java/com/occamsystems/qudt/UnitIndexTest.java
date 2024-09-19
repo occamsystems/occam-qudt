@@ -6,7 +6,9 @@ import com.occamsystems.qudt.predefined.units.L1M1T_2Units;
 import com.occamsystems.qudt.predefined.units.L1M1Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
+import com.occamsystems.qudt.predefined.units.L5Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -98,5 +100,58 @@ class UnitIndexTest {
     Assertions.assertEquals(builtUnit, quantityValue.unit);
     Assertions.assertEquals(3e5, quantityValue.value());
     Assertions.assertEquals(0.3, quantityValue.unscaled);
+  }
+
+  @Test
+  void simplifyUnit() {
+    UnitIndex index = new UnitIndex();
+    AggregateUnit aggM10 = new AggregateUnit(L5Units.M5.u, 2);
+    LiteralUnit litM10 = index.demandExactLiteral(aggM10, "http://occamsystems.com/test#");
+    Assertions.assertEquals("m¹⁰", litM10.symbol());
+    LiteralUnit m10 = index.demandExactLiteral("m10", "http://occamsystems.com/test#");
+    Assertions.assertEquals(m10, litM10);
+  }
+
+  @Test
+  void evaluateDemandLiteralPerformance() {
+    UnitIndex index = new UnitIndex();
+    long l = Double.doubleToLongBits(Math.random());
+    List<LiteralUnit> literalUnits = index.units().toList();
+    int size = literalUnits.size();
+    LiteralUnit[] l1 = new LiteralUnit[29];
+    for (int i = 0; i < 29; i++) {
+      l1[i] = literalUnits.get((int) (size * Math.random()));
+    }
+    LiteralUnit[] l2 = new LiteralUnit[31];
+    for (int i = 0; i < 31; i++) {
+      l2[i] = literalUnits.get((int) (size * Math.random()));
+    }
+
+    AggregateUnit[] rawAggs = new AggregateUnit[8192];
+
+    Instant now = Instant.now();
+
+    for (int i = 0; i < 8192; i++) {
+      int li = 4 * (i % 16);
+      int l1Exp = (int) (((l >> li) & 3) + 1);
+      int l2Exp = (int) (((l >> li + 2) & 3) + 1);
+      rawAggs[i] = new AggregateUnit(l1[i % 29], l1Exp, l2[i % 31], l2Exp);
+    }
+
+    long time = Instant.now().toEpochMilli() - now.toEpochMilli();
+    System.out.println("Created 8192 random aggregate pairs in " + time + "ms");
+
+    LiteralUnit[] finals = new LiteralUnit[8192];
+    index.simpleUnits();
+
+    now = Instant.now();
+    for (int i = 0; i < 8192; i++) {
+      finals[i] = index.demandExactLiteral(rawAggs[i], "http://occamsystems.com/test#");
+    }
+    time = Instant.now().toEpochMilli() - now.toEpochMilli();
+    System.out.println("Found exact literals for 8192 random aggregate pairs in " + time + "ms");
+    System.out.println((int) (((double) time) / 8.192) + "us per literal");
+
+    Assertions.assertTrue(time < 400, "Demanding units has gotten really slow.");
   }
 }
