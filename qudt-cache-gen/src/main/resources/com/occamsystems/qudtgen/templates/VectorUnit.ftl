@@ -4,6 +4,8 @@ import static com.occamsystems.qudt.predefined.DimensionVectors.*;
 
 import com.occamsystems.qudt.DimensionVector;
 import com.occamsystems.qudt.LiteralUnit;
+import com.occamsystems.qudt.QuantityKind;
+import com.occamsystems.qudt.predefined.QuantityKinds;
 import java.util.List;
 
 /**
@@ -16,9 +18,9 @@ public enum ${vector}Units {
 
   public final LiteralUnit u;
 
-  ${vector}Units(String label, String uri, String symbol, String code, DimensionVector dv,
-      double co, double cm) {
-    u = new LiteralUnit(label, uri, symbol, code, dv, co, cm);
+  ${vector}Units(String label, String uri, String symbol, DimensionVector dv,
+      double co, double cm, QuantityKind... qks) {
+    u = new LiteralUnit(label, uri, symbol, dv, co, cm, qks);
   }
 
   private static LiteralUnit[] cache = null;

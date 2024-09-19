@@ -11,6 +11,12 @@ public class GeneratorUtils {
   static final String HAS_VECTOR = "http://qudt.org/schema/qudt/hasDimensionVector";
   static final String REPLACED_BY = "http://purl.org/dc/terms/isReplacedBy";
 
+  static double doubleOrThrow(Resource res, Property conversionOffset) {
+    Statement stm = res.getProperty(conversionOffset);
+    assert stm != null;
+    return stm.getDouble();
+  }
+
   static double doubleOrElse(Resource res, Property conversionOffset, double v) {
     Statement stm = res.getProperty(conversionOffset);
     return stm == null ? v : stm.getDouble();

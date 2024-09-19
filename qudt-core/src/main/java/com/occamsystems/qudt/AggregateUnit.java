@@ -112,11 +112,6 @@ public class AggregateUnit extends Unit {
   }
 
   @Override
-  public String ucumCode() {
-    return "";
-  }
-
-  @Override
   public DimensionVector dv() {
     return this.components.entrySet().stream()
         .map(entry -> entry.getKey().dv().scaledBy(entry.getValue()))

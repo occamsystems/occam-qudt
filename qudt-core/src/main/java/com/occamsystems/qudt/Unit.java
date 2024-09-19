@@ -8,8 +8,6 @@ public abstract class Unit {
 
   public abstract String symbol();
 
-  public abstract String ucumCode();
-
   public abstract DimensionVector dv();
 
   public abstract double conversionMultiplier();

@@ -7,6 +7,7 @@ import com.occamsystems.qudt.predefined.units.L1M1Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.L5Units;
+import com.occamsystems.qudt.predefined.units.T1Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
 import java.time.Instant;
 import java.util.List;
@@ -100,6 +101,18 @@ class UnitIndexTest {
     Assertions.assertEquals(builtUnit, quantityValue.unit);
     Assertions.assertEquals(3e5, quantityValue.value());
     Assertions.assertEquals(0.3, quantityValue.unscaled);
+
+    QuantityValue neg70m3 = unitIndex.parseQuantity("-70 m3");
+    Assertions.assertEquals(-70, neg70m3.value());
+    Assertions.assertEquals(L3Units.M3.u, neg70m3.unit());
+
+    QuantityValue perSec = unitIndex.parseQuantity("10/s");
+    Assertions.assertEquals(10, perSec.value());
+    Assertions.assertEquals(T_1Units.PER_SEC.u, perSec.unit());
+
+    QuantityValue hour = unitIndex.parseQuantity("10 h");
+    Assertions.assertEquals(10, hour.value());
+    Assertions.assertEquals(T1Units.HR.u, hour.unit());
   }
 
   @Test

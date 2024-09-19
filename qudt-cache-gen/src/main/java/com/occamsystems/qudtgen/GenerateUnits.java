@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -25,7 +27,7 @@ public class GenerateUnits {
   private static final String CONV_M = "http://qudt.org/schema/qudt/conversionMultiplier";
   private static final String CONV_O = "http://qudt.org/schema/qudt/conversionOffset";
   private static final String SYMBOL = "http://qudt.org/schema/qudt/symbol";
-  private static final String UCUM_CODE = "http://qudt.org/schema/qudt/ucumCode";
+  private static final String HAS_KIND = "http://qudt.org/schema/qudt/hasQuantityKind";
 
   public void run(String outputFilePath) {
     Model model = ModelFactory.createDefaultModel();
@@ -35,7 +37,7 @@ public class GenerateUnits {
     Property conversionOffset = model.createProperty(CONV_O);
     Property conversionMult = model.createProperty(CONV_M);
     Property symbol = model.createProperty(SYMBOL);
-    Property ucumCode = model.createProperty(UCUM_CODE);
+    Property hasKind = model.createProperty(HAS_KIND);
     Property label = model.createProperty(GeneratorUtils.LABEL);
     Property replaced = model.createProperty(GeneratorUtils.REPLACED_BY);
 
@@ -44,29 +46,19 @@ public class GenerateUnits {
     Map<String, Map<String, String>> vectorToUnits = new HashMap<>(300);
     Map<String, String> replacementMap = new HashMap<>();
 
+    List<String> malformed = new ArrayList<>(250);
+    List<String> noKinds = new ArrayList<>(250);
+
     iterator.forEach(
         res -> {
           Statement isReplaced = res.getProperty(replaced);
-          if (isReplaced == null) {
-            String localName = res.getLocalName();
-            String vectorName =
-                GeneratorUtils.shortenVectorName(
-                    res.getProperty(hasVector).getObject().asResource().getLocalName());
-            Map<String, String> units =
-                vectorToUnits.computeIfAbsent(vectorName, n -> new TreeMap<>());
-            String args =
-                "\"%s\",\"%s\",\"%s\",\"%s\",%s,%s,%s"
-                    .formatted(
-                        GeneratorUtils.bestString(res, label),
-                        res.getLocalName(),
-                        GeneratorUtils.bestString(res, symbol),
-                        GeneratorUtils.bestString(res, ucumCode),
-                        vectorName,
-                        String.valueOf(GeneratorUtils.doubleOrElse(res, conversionOffset, 0.)),
-                        String.valueOf(GeneratorUtils.doubleOrElse(res, conversionMult, 1.)));
-
-            units.put(localName.replace("-", "_").replace("pt", "dot"), args);
-          } else {
+          String kinds =
+              res.listProperties(hasKind).toList().stream()
+                  .map(st -> GeneratorUtils.toConstName(st.getObject().asResource().getLocalName()))
+                  .filter(st -> !"UNKNOWN".equals(st))
+                  .map(st -> "QuantityKinds." + st + ".qk")
+                  .collect(Collectors.joining(","));
+          if (isReplaced != null) {
             try {
               replacementMap.put(
                   isReplaced.getSubject().getURI(), isReplaced.getObject().asResource().getURI());
@@ -77,8 +69,47 @@ public class GenerateUnits {
                   .info("Invalid replacement uri for " + isReplaced + "\n Repairing  as " + value);
               replacementMap.put(isReplaced.getSubject().getURI(), value);
             }
+          } else if (kinds.length() <= 2) {
+            noKinds.add(res.getLocalName());
+          } else {
+            String localName = res.getLocalName();
+            String vectorName =
+                GeneratorUtils.shortenVectorName(
+                    res.getProperty(hasVector).getObject().asResource().getLocalName());
+            Map<String, String> units =
+                vectorToUnits.computeIfAbsent(vectorName, n -> new TreeMap<>());
+
+            try {
+              String args =
+                  "\"%s\",\"%s\",\"%s\",%s,%s,%s,%s"
+                      .formatted(
+                          GeneratorUtils.bestString(res, label),
+                          res.getLocalName(),
+                          GeneratorUtils.bestString(res, symbol),
+                          vectorName,
+                          String.valueOf(GeneratorUtils.doubleOrElse(res, conversionOffset, 0.)),
+                          String.valueOf(GeneratorUtils.doubleOrThrow(res, conversionMult)),
+                          kinds);
+
+              units.put(localName.replace("-", "_").replace("pt", "dot"), args);
+            } catch (Throwable t) {
+              malformed.add(res.getURI());
+            }
           }
         });
+
+    Logger.getLogger(GeneratorUtils.class.getName())
+        .info(
+            "Missing required information on "
+                + malformed.size()
+                + " units:\n"
+                + String.join("\n", malformed));
+    Logger.getLogger(GeneratorUtils.class.getName())
+        .info(
+            "No valid quantity kinds on "
+                + noKinds.size()
+                + " units:\n"
+                + String.join("\n", noKinds));
 
     Configuration freemarker = new Configuration(Configuration.VERSION_2_3_33);
     freemarker.setClassForTemplateLoading(this.getClass(), "templates");

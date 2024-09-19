@@ -192,7 +192,6 @@ public class UnitIndex {
             unit.label(),
             namespace + toKeyboardChars(unit.symbol()),
             unit.symbol(),
-            unit.ucumCode(),
             unit.dv(),
             unit.conversionOffset(),
             unit.conversionMultiplier());
@@ -218,7 +217,6 @@ public class UnitIndex {
             unit.label(),
             namespace + toKeyboardChars(unit.symbol()),
             unit.symbol(),
-            unit.ucumCode(),
             unit.dv(),
             unit.conversionOffset(),
             unit.conversionMultiplier());
@@ -272,9 +270,47 @@ public class UnitIndex {
     return candidates
         .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
         .sorted(
-            Comparator.comparing(u -> ((Unit) u).symbol().length())
+            Comparator.comparing(u -> symbolicDifference(base, (Unit) u))
+                .thenComparing(u -> ((Unit) u).symbol().length())
                 .thenComparing(u -> ((Unit) u).symbol()))
         .findFirst();
+  }
+
+  private int symbolicDifference(Unit base, Unit other) {
+    String bs = toKeyboardChars(base.symbol());
+    String os = toKeyboardChars(other.symbol());
+    if (bs.equals(os)) {
+      return 0;
+    }
+
+    return editDistance(bs, os);
+  }
+
+  private static int editDistance(String x, String y) {
+    int[][] dp = new int[x.length() + 1][y.length() + 1];
+
+    for (int i = 0; i <= x.length(); i++) {
+      for (int j = 0; j <= y.length(); j++) {
+        if (i == 0) {
+          dp[i][j] = j;
+        } else if (j == 0) {
+          dp[i][j] = i;
+        } else {
+          dp[i][j] =
+              Math.min(
+                  Math.min(
+                      dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
+                      dp[i - 1][j] + 1),
+                  dp[i][j - 1] + 1);
+        }
+      }
+    }
+
+    return dp[x.length()][y.length()];
+  }
+
+  static int costOfSubstitution(char a, char b) {
+    return a == b ? 0 : 1;
   }
 
   /**

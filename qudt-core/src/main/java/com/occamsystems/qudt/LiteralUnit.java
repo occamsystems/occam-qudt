@@ -6,26 +6,26 @@ public class LiteralUnit extends Unit {
   private String label;
   private String uri;
   private String symbol;
-  private String ucumCode;
   private DimensionVector dv;
   private double conversionOffset;
   private double conversionMultiplier;
+  private QuantityKind[] quantityKinds;
 
   public LiteralUnit(
       String label,
       String uri,
       String symbol,
-      String ucumCode,
       DimensionVector dv,
       double conversionOffset,
-      double conversionMultiplier) {
+      double conversionMultiplier,
+      QuantityKind... quantityKinds) {
     this.label = label;
     this.uri = uri;
     this.symbol = symbol;
-    this.ucumCode = ucumCode;
     this.dv = dv;
     this.conversionOffset = conversionOffset;
     this.conversionMultiplier = conversionMultiplier;
+    this.quantityKinds = quantityKinds;
   }
 
   public String uri() {
@@ -47,11 +47,6 @@ public class LiteralUnit extends Unit {
   }
 
   @Override
-  public String ucumCode() {
-    return this.ucumCode;
-  }
-
-  @Override
   public DimensionVector dv() {
     return this.dv;
   }
@@ -64,5 +59,9 @@ public class LiteralUnit extends Unit {
   @Override
   public double conversionOffset() {
     return this.conversionOffset;
+  }
+
+  public QuantityKind[] quantityKinds() {
+    return quantityKinds;
   }
 }
