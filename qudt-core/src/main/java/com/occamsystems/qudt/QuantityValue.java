@@ -6,9 +6,19 @@ import java.util.Objects;
 /** Copyright (c) 2024 Occam Systems, Inc. */
 public class QuantityValue implements Comparable<QuantityValue> {
 
-  public static final double EPSILON = 0.00001;
+  private static double EPSILON = 0.00001;
   double unscaled;
   Unit unit;
+
+  /**
+   * Sets the default precision for equivalence checks. The same default is applied for both ratio
+   * and absolute equivalence functions. Has a default value of 0.00001.
+   */
+  public static void epsilon(double epsilon) {
+    assert epsilon > 0 && epsilon < 1;
+
+    EPSILON = epsilon;
+  }
 
   public static QuantityValue ofNumber(double value) {
     return new QuantityValue(value, D1Units.NUM.u);
@@ -37,6 +47,45 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   public double value() {
     return this.unit.scale(unscaled);
+  }
+
+  /**
+   * Checks whether the absolute difference of quantities is within the default epsilon. Note that
+   * this is not strict equality and may not be transitive if epsilon is large relative to the
+   * distribution of values.
+   */
+  public static boolean equivalentAbsolute(QuantityValue qv, QuantityValue qv2) {
+    return equivalentAbsolute(qv, qv2, EPSILON);
+  }
+
+  /**
+   * Checks whether the absolute difference of quantities is within a given epsilon. Note that this
+   * is not strict equality and may not be transitive if epsilon is large relative to the
+   * distribution of values.
+   */
+  public static boolean equivalentAbsolute(QuantityValue qv, QuantityValue qv2, double epsilon) {
+    return qv == qv2
+        || (qv.unit.isConvertible(qv2.unit) && Math.abs(qv.unscaled - qv2.unscaled) < epsilon);
+  }
+
+  /**
+   * Checks whether the ratio difference of quantities is within the default epsilon. Note that this
+   * is not strict equality and may not be transitive if epsilon is large relative to the
+   * distribution of values.
+   */
+  public static boolean equivalentRatio(QuantityValue qv, QuantityValue qv2) {
+    return equivalentRatio(qv, qv2, EPSILON);
+  }
+
+  /**
+   * Checks whether the ratio difference of quantities is within a given epsilon. Note that this is
+   * not strict equality and may not be transitive if epsilon is large relative to the distribution
+   * of values.
+   */
+  public static boolean equivalentRatio(QuantityValue qv, QuantityValue qv2, double epsilon) {
+    return qv == qv2
+        || (qv.unit.isConvertible(qv2.unit)
+            && Math.abs(1 - (qv.unscaled / qv2.unscaled)) < epsilon);
   }
 
   public static QuantityValue converted(QuantityValue qv, Unit u) {
@@ -104,10 +153,6 @@ public class QuantityValue implements Comparable<QuantityValue> {
   @Override
   public int compareTo(QuantityValue o) {
     if (this.unit.isConvertible(o.unit)) {
-      if (Math.abs(1 - (this.unscaled / o.unscaled)) < EPSILON) {
-        return 0;
-      }
-
       return Double.compare(this.unscaled, o.unscaled);
     }
 
@@ -123,7 +168,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
       return false;
     }
     QuantityValue that = (QuantityValue) o;
-    return Double.compare(that.unscaled, unscaled) == 0 && unit.isConvertible(that.unit);
+    return that.unscaled == unscaled && unit.isConvertible(that.unit);
   }
 
   @Override
