@@ -43,7 +43,7 @@ public class UnitIndex {
 
   private static final Pattern QTY_PATTERN = Pattern.compile(QTY_REGEX);
 
-  private List<Unit> preferredUnits = new ArrayList<>(3);
+  private final Map<DimensionVector, List<LiteralUnit>> preferredUnits = new HashMap<>(3);
 
   /**
    * Creates a new unit index.
@@ -51,10 +51,20 @@ public class UnitIndex {
    * @param preferredUnits Optionally specify units that should be preferentially selected in the
    *     case of ambiguity.
    */
-  public UnitIndex(Unit... preferredUnits) {
-    this.preferredUnits.add(H1Units.K.u);
-    this.preferredUnits.add(L3Units.L.u);
-    this.preferredUnits.addAll(List.of(preferredUnits));
+  public UnitIndex(LiteralUnit... preferredUnits) {
+    this.preferUnit(D1Units.UNITLESS.u);
+    this.preferUnit(H1Units.K.u);
+    this.preferUnit(L3Units.L.u);
+
+    for (int i = 0; i < preferredUnits.length; i++) {
+      preferUnit(preferredUnits[i]);
+    }
+  }
+
+  public void preferUnit(LiteralUnit unit) {
+    assert unit != null;
+
+    this.preferredUnits.computeIfAbsent(unit.dv(), k -> new ArrayList<>(2)).add(unit);
   }
 
   /**
@@ -84,9 +94,15 @@ public class UnitIndex {
           LiteralUnit prev = simpleSymbolMap.get(key);
 
           if (!prev.equivalent(simpleUnit)) {
+            boolean prefSu = false;
+            boolean prefPrev = false;
 
-            boolean prefSu = this.preferredUnits.contains(simpleUnit);
-            boolean prefPrev = this.preferredUnits.contains(prev);
+            if (this.preferredUnits.containsKey(simpleUnit.dv())) {
+              prefSu = this.preferredUnits.get(simpleUnit.dv()).contains(simpleUnit);
+            }
+            if (this.preferredUnits.containsKey(prev.dv())) {
+              prefPrev = this.preferredUnits.get(prev.dv()).contains(prev);
+            }
 
             int suQk =
                 kindsByDimensionVector()
@@ -234,15 +250,30 @@ public class UnitIndex {
       return Optional.of(lu);
     }
 
+    if (this.preferredUnits.containsKey(base.dv())) {
+      Optional<LiteralUnit> preferredMatch =
+          exactMatch(base, this.preferredUnits.get(base.dv()).stream());
+      if (preferredMatch.isPresent()) {
+        return preferredMatch;
+      }
+    }
+
     LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[] {});
     Collection<LiteralUnit> runtimeMatches =
         this.runtimeUnits.getOrDefault(base.dv().indexCode(), Collections.emptyList());
 
+    return exactMatch(base, Stream.concat(Arrays.stream(matches), runtimeMatches.stream()));
+  }
+
+  private Optional<LiteralUnit> exactMatch(Unit base, Stream<LiteralUnit> candidates) {
     double cm = base.conversionMultiplier();
     double co = base.conversionOffset();
-    return Stream.concat(Arrays.stream(matches), runtimeMatches.stream())
+
+    return candidates
         .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
-        .sorted(Comparator.comparing(u -> ((Unit) u).symbol().length()))
+        .sorted(
+            Comparator.comparing(u -> ((Unit) u).symbol().length())
+                .thenComparing(u -> ((Unit) u).symbol()))
         .findFirst();
   }
 
@@ -333,8 +364,16 @@ public class UnitIndex {
   }
 
   private int preferredUnit(Unit u1, Unit u2) {
-    boolean pref1 = this.preferredUnits.contains(u1);
-    boolean pref2 = this.preferredUnits.contains(u2);
+    boolean pref1 = false;
+    boolean pref2 = false;
+
+    if (this.preferredUnits.containsKey(u1.dv())) {
+      pref1 = this.preferredUnits.get(u1.dv()).contains(u1);
+    }
+
+    if (this.preferredUnits.containsKey(u2.dv())) {
+      pref2 = this.preferredUnits.get(u2.dv()).contains(u2);
+    }
 
     if (pref1 && !pref2) {
       return -1;

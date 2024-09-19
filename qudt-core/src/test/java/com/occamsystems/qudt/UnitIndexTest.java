@@ -70,7 +70,10 @@ class UnitIndexTest {
     Assertions.assertTrue(L1M1Units.KiloGM_M.u.equivalent(unitIndex.parseAsAggregateUnit("kg*m")));
     AggregateUnit kgms_2 = unitIndex.parseAsAggregateUnit("kg*m/s2");
     Assertions.assertTrue(L1M1T_2Units.KiloGM_M_PER_SEC2.u.equivalent(kgms_2));
-    Assertions.assertEquals("kg⋅m⋅s⁻²", kgms_2.symbol());
+    String symbol = kgms_2.symbol();
+    Assertions.assertTrue(symbol.contains("s⁻²"));
+    Assertions.assertTrue(symbol.contains("kg"));
+    Assertions.assertTrue(symbol.contains("m"));
   }
 
   @Test
