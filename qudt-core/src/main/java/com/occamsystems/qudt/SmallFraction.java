@@ -19,6 +19,8 @@ public class SmallFraction extends Number {
   private int num;
   private int denom;
 
+  private boolean reduced;
+
   public static final NumberFormat NF;
 
   static {
@@ -49,7 +51,7 @@ public class SmallFraction extends Number {
       }
     }
 
-    return new SmallFraction((int) val);
+    return new SmallFraction((int) Math.round(val));
   }
 
   public int intValue() {
@@ -74,6 +76,10 @@ public class SmallFraction extends Number {
    * @return This fraction, reduced.
    */
   public SmallFraction reduce() {
+    if (this.reduced) {
+      return this;
+    }
+
     int gcd = gcd(Math.abs(this.num), Math.abs(this.denom));
     this.num = this.num / gcd;
     this.denom = this.denom / gcd;
@@ -82,6 +88,8 @@ public class SmallFraction extends Number {
       this.num *= -1;
       this.denom *= -1;
     }
+
+    this.reduced = true;
 
     return this;
   }
@@ -135,20 +143,24 @@ public class SmallFraction extends Number {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    if (o instanceof SmallFraction osf) {
+      this.reduce();
+      osf.reduce();
+      return this.num == osf.num && this.denom == osf.denom;
     }
-    SmallFraction that = (SmallFraction) o;
-    return doubleValue() == that.doubleValue();
+
+    return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(doubleValue());
+    this.reduce();
+    return Objects.hash(this.num, this.denom);
   }
 
   @Override
   public String toString() {
+    this.reduce();
     if (denom == 1) {
       return String.valueOf(num);
     }

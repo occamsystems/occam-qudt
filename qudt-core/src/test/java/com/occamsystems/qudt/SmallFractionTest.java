@@ -20,10 +20,6 @@ class SmallFractionTest {
   @Test
   void reduce() {
     SmallFraction smallFraction = new SmallFraction(-12, -8);
-    Assertions.assertEquals("-12/-8", smallFraction.toString());
-    Assertions.assertEquals(1.5, smallFraction.floatValue());
-
-    smallFraction.reduce();
 
     Assertions.assertEquals("3/2", smallFraction.toString());
     Assertions.assertEquals(1.5, smallFraction.floatValue());
