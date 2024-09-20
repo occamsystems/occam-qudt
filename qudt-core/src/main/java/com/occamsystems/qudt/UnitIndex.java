@@ -30,6 +30,7 @@ public class UnitIndex {
   public static final Logger log = Logger.getLogger(UnitIndex.class.getName());
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
+  private Map<String, List<LiteralUnit>> symbolMap = null;
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
   private Map<String, Collection<LiteralUnit>> runtimeUnits = new HashMap<>();
 
@@ -230,13 +231,29 @@ public class UnitIndex {
    * mean that symbol of the returned unit will be exactly the provided symbol.
    */
   public Unit exactMatch(String symbol) {
+    String keys = toKeyboardChars(symbol);
+    if (this.symbolMap().containsKey(keys)) {
+      return this.symbolMap.get(keys).iterator().next();
+    }
+
     AggregateUnit aggregateUnit = parseAsAggregateUnit(symbol);
     Optional<LiteralUnit> literalUnit = exactMatch(aggregateUnit);
+
     if (literalUnit.isPresent()) {
+      this.symbolMap.computeIfAbsent(keys, k -> new ArrayList<>(1)).add(literalUnit.get());
       return literalUnit.get();
     } else {
       return aggregateUnit;
     }
+  }
+
+  private Map<String, List<LiteralUnit>> symbolMap() {
+    if (this.symbolMap == null) {
+      this.symbolMap =
+          this.units().collect(Collectors.groupingBy(u -> toKeyboardChars(u.symbol())));
+    }
+
+    return this.symbolMap;
   }
 
   /**
@@ -507,6 +524,8 @@ public class UnitIndex {
     Collection<LiteralUnit> list =
         this.runtimeUnits.computeIfAbsent(unit.dv().indexCode(), k -> new HashSet<>());
     list.add(unit);
+    String sym = toKeyboardChars(unit.symbol());
+    this.symbolMap().computeIfAbsent(sym, k -> new ArrayList<>(1)).add(unit);
   }
 
   public Optional<LiteralUnit> unitByUri(String uri) {
