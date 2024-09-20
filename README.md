@@ -43,7 +43,7 @@ new AggregateUnit(L_2Units.PER_M2.u, new SmallFraction(-3, 2)).equivalent(unitIn
 
 Given an aggregate unit, you can find the closest predefined unit that matches it.
 ```
-L5Units.M5.u == unitIndex.bestPredefinedMatch(new AggregateUnit(L3Units.L.u, 5, 3))
+L5Units.M5.u == unitIndex.bestPredefinedMatch(new AggregateUnit(L3Units.L.u, new SmallFraction(5, 3)))
 ```
 
 ### Quantity Values
@@ -56,7 +56,7 @@ QuantityValue.ofScaled(1, L1Units.KiloM.u) == QuantityValue.ofUnscaled(1000, L1U
 All Quantity Values are stored in memory based on their *unscaled* values.
 This means that unit conversion only rewrites a pointer.
 Additionally, it means that all fundamental operations over quantities require no intermediate conversions. 
-Operations are available as static and local methods, with local method have mutating and non-mutating variants.
+Operations are available as static and local methods, with local methods having mutating and non-mutating variants.
 Non-mutating methods are the same as static methods and allocate new QuantityValues.
 ```
 QuantityValue qv3 = QuantityValue.add(qv1, qv2); // Allocates
