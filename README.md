@@ -37,7 +37,7 @@ new AggregateUnit(L1Units.KiloM.u, 3, T1.Units.S.u, -4).equivalent(unitIndex.exa
 All unit exponents must be rational, but need not be integers.
 
 ```
-new AggregateUnit(L3Units.L.u, 1, 3).equivalent(unitIndex.exactMatch("dm"))
+new AggregateUnit(L3Units.L.u, SmallFraction.approximate(0.3333)).equivalent(unitIndex.exactMatch("dm"))
 new AggregateUnit(L_2Units.PER_M2.u, new SmallFraction(-3, 2)).equivalent(unitIndex.exactMatch("m3"))
 ```
 
