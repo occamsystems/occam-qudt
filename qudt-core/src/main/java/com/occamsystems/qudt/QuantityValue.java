@@ -50,6 +50,182 @@ public class QuantityValue implements Comparable<QuantityValue> {
   }
 
   /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue plus(QuantityValue other) {
+    return QuantityValue.add(this, other);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue minus(QuantityValue other) {
+    return QuantityValue.subtract(this, other);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue times(QuantityValue other) {
+    return QuantityValue.multiply(this, other);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue times(double other) {
+    return QuantityValue.multiply(this, other);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue dividedBy(QuantityValue other) {
+    return QuantityValue.divide(this, other);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue dividedBy(double other) {
+    return QuantityValue.divide(this, other);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue toPower(int pow) {
+    return QuantityValue.pow(this, pow);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue toPower(SmallFraction pow) {
+    return QuantityValue.pow(this, pow);
+  }
+
+  /**
+   * Creates a new QuantityValue by applying the specified operation.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue toPower(int powNum, int powDenom) {
+    return QuantityValue.pow(this, new SmallFraction(powNum, powDenom));
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue plusMut(QuantityValue other) {
+    assert this.unit.isConvertible(other.unit);
+    this.unscaled += other.unscaled;
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue minusMut(QuantityValue other) {
+    assert this.unit.isConvertible(other.unit);
+    this.unscaled -= other.unscaled;
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue timesMut(QuantityValue other) {
+    this.unscaled *= other.unscaled;
+    this.unit = new AggregateUnit(this.unit, 1, other.unit, 1);
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue timesMut(double other) {
+    this.unscaled *= other;
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue dividedByMut(QuantityValue other) {
+    this.unscaled /= other.unscaled;
+    this.unit = new AggregateUnit(this.unit, 1, other.unit, -1);
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue dividedByMut(double other) {
+    this.unscaled /= other;
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue toPowerMut(int pow) {
+    this.unscaled = Math.pow(this.unscaled, pow);
+    this.unit = new AggregateUnit(this.unit, pow);
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue toPowerMut(SmallFraction pow) {
+    this.unscaled = Math.pow(this.unscaled, pow.doubleValue());
+    this.unit = new AggregateUnit(this.unit, pow);
+    return this;
+  }
+
+  /**
+   * Mutates this QuantityValue by applying the specified operation.
+   * @return This QuantityValue with an updated value.
+   */
+  public QuantityValue toPowerMut(int powNum, int powDenom) {
+    return this.toPowerMut(new SmallFraction(powNum, powDenom));
+  }
+
+  /**
+   * Creates a new QuantityValue equivalent to this, but in the specified unit.
+   * @return A new QuantityValue.
+   */
+  public QuantityValue inUnit(Unit unit) {
+    return QuantityValue.converted(this, unit);
+  }
+
+  /**
+   * Mutates this QuantityValue by setting its unit.
+   * @return This QuantityValue with an updated unit.
+   */
+  public QuantityValue inUnitMut(Unit unit) {
+    assert this.unit().isConvertible(unit);
+    this.unit = unit;
+    return this;
+  }
+
+  /**
    * Checks whether the absolute difference of quantities is within the default epsilon. Note that
    * this is not strict equality and may not be transitive if epsilon is large relative to the
    * distribution of values.
