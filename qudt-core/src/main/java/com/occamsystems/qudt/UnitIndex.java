@@ -33,7 +33,7 @@ public class UnitIndex {
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
   private Map<String, Collection<LiteralUnit>> runtimeUnits = new HashMap<>();
 
-  private static final String SIMPLE_NUMBER_REGEX = "[-+]?\\d*(\\.\\d+)?";
+  private static final String SIMPLE_NUMBER_REGEX = "[-+]?[\\d,]*(\\.\\d+)?";
   private static final String NUMBER_REGEX = SIMPLE_NUMBER_REGEX + "([eE][-+]?\\d+)?";
   private static final String UNIT_REGEX =
       "(?<name>([^-+.\\d]+))(?<exponent>(" + SIMPLE_NUMBER_REGEX + "))?";
@@ -496,7 +496,8 @@ public class UnitIndex {
       } else {
         unit = this.exactMatch(unitString);
       }
-      return QuantityValue.ofScaled(Double.parseDouble(valueString), unit);
+      return QuantityValue.ofScaled(
+          Double.parseDouble(String.join("", valueString.split(","))), unit);
     }
 
     return null;

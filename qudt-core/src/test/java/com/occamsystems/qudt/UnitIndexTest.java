@@ -7,6 +7,7 @@ import com.occamsystems.qudt.predefined.units.L1M1Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.L5Units;
+import com.occamsystems.qudt.predefined.units.M1Units;
 import com.occamsystems.qudt.predefined.units.T1Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
 import java.time.Instant;
@@ -113,6 +114,10 @@ class UnitIndexTest {
     QuantityValue hour = unitIndex.parseQuantity("10 h");
     Assertions.assertEquals(10, hour.value());
     Assertions.assertEquals(T1Units.HR.u, hour.unit());
+
+    QuantityValue withComma = unitIndex.parseQuantity("7,500 g");
+    Assertions.assertEquals(7500, withComma.value());
+    Assertions.assertEquals(M1Units.GM.u, withComma.unit());
   }
 
   @Test

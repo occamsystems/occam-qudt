@@ -51,6 +51,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue plus(QuantityValue other) {
@@ -59,6 +60,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue minus(QuantityValue other) {
@@ -67,6 +69,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue times(QuantityValue other) {
@@ -75,6 +78,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue times(double other) {
@@ -83,6 +87,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue dividedBy(QuantityValue other) {
@@ -91,6 +96,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue dividedBy(double other) {
@@ -99,6 +105,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue toPower(int pow) {
@@ -107,6 +114,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue toPower(SmallFraction pow) {
@@ -115,6 +123,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue by applying the specified operation.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue toPower(int powNum, int powDenom) {
@@ -123,6 +132,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue plusMut(QuantityValue other) {
@@ -133,6 +143,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue minusMut(QuantityValue other) {
@@ -143,6 +154,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue timesMut(QuantityValue other) {
@@ -153,6 +165,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue timesMut(double other) {
@@ -162,6 +175,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue dividedByMut(QuantityValue other) {
@@ -172,6 +186,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue dividedByMut(double other) {
@@ -181,6 +196,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue toPowerMut(int pow) {
@@ -191,6 +207,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue toPowerMut(SmallFraction pow) {
@@ -201,6 +218,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by applying the specified operation.
+   *
    * @return This QuantityValue with an updated value.
    */
   public QuantityValue toPowerMut(int powNum, int powDenom) {
@@ -209,6 +227,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Creates a new QuantityValue equivalent to this, but in the specified unit.
+   *
    * @return A new QuantityValue.
    */
   public QuantityValue inUnit(Unit unit) {
@@ -217,6 +236,7 @@ public class QuantityValue implements Comparable<QuantityValue> {
 
   /**
    * Mutates this QuantityValue by setting its unit.
+   *
    * @return This QuantityValue with an updated unit.
    */
   public QuantityValue inUnitMut(Unit unit) {
