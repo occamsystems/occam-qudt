@@ -28,6 +28,8 @@ public class GenerateUnits {
   private static final String CONV_O = "http://qudt.org/schema/qudt/conversionOffset";
   private static final String SYMBOL = "http://qudt.org/schema/qudt/symbol";
   private static final String HAS_KIND = "http://qudt.org/schema/qudt/hasQuantityKind";
+  private static final String APPLICABLE_SYSTEM = "http://qudt.org/schema/qudt/applicableSystem";
+  public static final Logger log = Logger.getLogger(GeneratorUtils.class.getName());
 
   public void run(String outputFilePath) {
     Model model = ModelFactory.createDefaultModel();
@@ -38,6 +40,7 @@ public class GenerateUnits {
     Property conversionMult = model.createProperty(CONV_M);
     Property symbol = model.createProperty(SYMBOL);
     Property hasKind = model.createProperty(HAS_KIND);
+    Property system = model.createProperty(APPLICABLE_SYSTEM);
     Property label = model.createProperty(GeneratorUtils.LABEL);
     Property replaced = model.createProperty(GeneratorUtils.REPLACED_BY);
 
@@ -48,6 +51,7 @@ public class GenerateUnits {
 
     List<String> malformed = new ArrayList<>(250);
     List<String> noKinds = new ArrayList<>(250);
+    List<String> noSystems = new ArrayList<>(250);
 
     iterator.forEach(
         res -> {
@@ -58,6 +62,7 @@ public class GenerateUnits {
                   .filter(st -> !"UNKNOWN".equals(st))
                   .map(st -> "QuantityKinds." + st + ".qk")
                   .collect(Collectors.joining(","));
+          Statement hasSystem = res.getProperty(system);
           if (isReplaced != null) {
             try {
               replacementMap.put(
@@ -65,12 +70,13 @@ public class GenerateUnits {
             } catch (Exception e) {
               String[] split = isReplaced.getString().split(":");
               String value = model.getNsPrefixURI(split[0]) + split[1];
-              Logger.getLogger(GenerateUnits.class.getName())
-                  .info("Invalid replacement uri for " + isReplaced + "\n Repairing  as " + value);
+              log.fine("Invalid replacement uri for " + isReplaced + "\n Repairing  as " + value);
               replacementMap.put(isReplaced.getSubject().getURI(), value);
             }
           } else if (kinds.length() <= 2) {
             noKinds.add(res.getLocalName());
+          } else if (hasSystem == null) {
+            noSystems.add(res.getLocalName());
           } else {
             String localName = res.getLocalName();
             String vectorName =
@@ -98,18 +104,14 @@ public class GenerateUnits {
           }
         });
 
-    Logger.getLogger(GeneratorUtils.class.getName())
-        .info(
-            "Missing required information on "
-                + malformed.size()
-                + " units:\n"
-                + String.join("\n", malformed));
-    Logger.getLogger(GeneratorUtils.class.getName())
-        .info(
-            "No valid quantity kinds on "
-                + noKinds.size()
-                + " units:\n"
-                + String.join("\n", noKinds));
+    log.info("Missing required information on " + malformed.size() + " units");
+    log.fine(String.join("\n", malformed));
+    log.info("No valid quantity kinds on " + noKinds.size() + " additional units");
+    log.fine(String.join("\n", noKinds));
+    log.info("No applicable systems on " + noSystems.size() + " additional units");
+    log.fine(String.join("\n", noSystems));
+
+    log.info("Accepted units: " + vectorToUnits.values().stream().mapToInt(Map::size).sum());
 
     Configuration freemarker = new Configuration(Configuration.VERSION_2_3_33);
     freemarker.setClassForTemplateLoading(this.getClass(), "templates");
