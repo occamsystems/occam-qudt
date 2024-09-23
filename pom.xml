@@ -11,6 +11,7 @@
   <modules>
     <module>qudt-cache-gen</module>
     <module>qudt-core</module>
+    <module>qudt-jena</module>
   </modules>
 
   <properties>
