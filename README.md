@@ -63,3 +63,10 @@ QuantityValue qv3 = QuantityValue.add(qv1, qv2); // Allocates
 QuantityValue qv4 = qv1.plus(qv2); // Allocates
 qv1.plusMut(qv2); // Mutates
 ```
+
+## Jena QUDT
+
+This module enables reading and writing of QUDT elements from RDF at runtime using Apache Jena.
+
+Note that Jena is used during parsing of the vocabulary files during cache generation.
+However, this dependency is intentionally separated from the Core module.
