@@ -9,6 +9,7 @@ public class DimensionVector {
   public static final String DIMENSIONLESS_NAME = "A0E0L0I0M0H0T0D1";
   public static final String DIMENSIONLESS_CODE = "D1";
   public static final String QKDV = "http://qudt.org/vocab/dimensionvector/";
+  public static final String LOCAL_NAME_REGEX = "[AELIMHTD]";
   private final SmallFraction[] vector = new SmallFraction[7];
   public static final int amountOfSubstance = 0;
   public static final int electricCurrent = 1;
@@ -27,7 +28,7 @@ public class DimensionVector {
   public DimensionVector(String uri) {
     String[] names = uri.split(QKDV);
     String localName = names[names.length - 1];
-    String regex = "[AELIMHTD]";
+    String regex = LOCAL_NAME_REGEX;
     String[] split = localName.split(regex);
     int[] array = new int[14];
     if (split.length >= 9) {
@@ -134,6 +135,48 @@ public class DimensionVector {
     }
 
     return b.isEmpty() ? DIMENSIONLESS_CODE : b.toString().replace(".", "dot").replace("-", "_");
+  }
+
+  public SmallFraction amount() {
+    return this.vector[amountOfSubstance];
+  }
+
+  public SmallFraction current() {
+    return this.vector[electricCurrent];
+  }
+
+  public SmallFraction length() {
+    return this.vector[length];
+  }
+
+  public SmallFraction luminous() {
+    return this.vector[luminousIntensity];
+  }
+
+  public SmallFraction mass() {
+    return this.vector[mass];
+  }
+
+  public SmallFraction temperature() {
+    return this.vector[thermodynamicTemperature];
+  }
+
+  public SmallFraction time() {
+    return this.vector[time];
+  }
+
+  public SmallFraction dimensionlessExponent() {
+    return this.dimensionless() ? SmallFraction.ONE : SmallFraction.ZERO;
+  }
+
+  public SmallFraction[] vector() {
+    return this.vector;
+  }
+
+  public static boolean isSemanticUri(String uri) {
+    String[] split = uri.split("[/#]");
+    String localName = split[split.length - 1];
+    return localName.split(LOCAL_NAME_REGEX).length == 9;
   }
 
   public static DimensionVector add(DimensionVector a, DimensionVector b) {
