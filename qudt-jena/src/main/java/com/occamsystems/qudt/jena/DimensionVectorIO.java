@@ -23,12 +23,15 @@ public class DimensionVectorIO {
   public static final String temperatureExp = "dimensionExponentForThermodynamicTemperature";
   public static final String dimensionlessExp = "dimensionlessExponent";
 
-  LiteralDimensionVector read(Model model, String uri) {
+  public LiteralDimensionVector read(Model model, String uri) {
     Resource resource = model.getResource(uri);
     if (resource == null) {
       return null;
     }
+    return this.read(model, resource);
+  }
 
+  public LiteralDimensionVector read(Model model, Resource resource) {
     String localName = resource.getLocalName();
     if (DimensionVector.isSemanticUri(localName)) {
       return new LiteralDimensionVector(localName);
@@ -41,17 +44,19 @@ public class DimensionVectorIO {
       Property e = qudtProperty(model, currentExp);
       Property t = qudtProperty(model, timeExp);
 
-      DimensionVector rawDv = DimensionVector.builder()
-          .withLength(ModelUtils.orElse(resource, l, SmallFraction.ZERO))
-          .withMass(ModelUtils.orElse(resource, m, SmallFraction.ZERO))
-          .withThermodynamicTemperature(ModelUtils.orElse(resource, h, SmallFraction.ZERO))
-          .withLuminousIntensity(ModelUtils.orElse(resource, i, SmallFraction.ZERO))
-          .withAmountOfSubstance(ModelUtils.orElse(resource, a, SmallFraction.ZERO))
-          .withElectricCurrent(ModelUtils.orElse(resource, e, SmallFraction.ZERO))
-          .withTime(ModelUtils.orElse(resource, t, SmallFraction.ZERO))
-          .build();
+      DimensionVector rawDv =
+          DimensionVector.builder()
+              .withLength(ModelUtils.orElse(resource, l, SmallFraction.ZERO))
+              .withMass(ModelUtils.orElse(resource, m, SmallFraction.ZERO))
+              .withThermodynamicTemperature(ModelUtils.orElse(resource, h, SmallFraction.ZERO))
+              .withLuminousIntensity(ModelUtils.orElse(resource, i, SmallFraction.ZERO))
+              .withAmountOfSubstance(ModelUtils.orElse(resource, a, SmallFraction.ZERO))
+              .withElectricCurrent(ModelUtils.orElse(resource, e, SmallFraction.ZERO))
+              .withTime(ModelUtils.orElse(resource, t, SmallFraction.ZERO))
+              .build();
 
-      LiteralDimensionVector ldv = new LiteralDimensionVector(rawDv.vector()).uri(uri);
+      LiteralDimensionVector ldv =
+          new LiteralDimensionVector(rawDv.vector()).uri(resource.getURI());
       Statement label = resource.getProperty(rdfsProperty(model, "label"));
 
       if (label != null) {
@@ -62,11 +67,11 @@ public class DimensionVectorIO {
     }
   }
 
-  Resource write(Model m, DimensionVector dv) {
+  public Resource write(Model m, DimensionVector dv) {
     return this.write(m, dv, dv.uri());
   }
 
-  Resource write(Model m, DimensionVector dv, String uri) {
+  public Resource write(Model m, DimensionVector dv, String uri) {
     Resource r = m.getResource(uri);
     if (dv instanceof LiteralDimensionVector ldv) {
       setLiteral(r, rdfsProperty(m, "label"), ldv.label());

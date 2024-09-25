@@ -14,6 +14,16 @@ public abstract class ModelUtils {
 
   private ModelUtils() {}
 
+  static String orElse(Resource resource, Property t, String defaultValue) {
+    Statement statement = resource.getProperty(t);
+
+    if (statement != null) {
+      return statement.getString();
+    }
+
+    return defaultValue;
+  }
+
   static SmallFraction orElse(Resource resource, Property t, SmallFraction defaultValue) {
     Statement statement = resource.getProperty(t);
 
@@ -42,7 +52,7 @@ public abstract class ModelUtils {
     return property(model, SCHEMA_QUDT, localName);
   }
 
-  private static Property property(Model model, String schema, String localName) {
+  public static Property property(Model model, String schema, String localName) {
     Property property = model.getProperty(schema + localName);
     if (property == null) {
       return model.createProperty(schema, localName);
@@ -60,5 +70,15 @@ public abstract class ModelUtils {
   public static void setLiteral(Resource r, Property p, Object o) {
     r.removeAll(p);
     r.addLiteral(p, o);
+  }
+
+  public static void setResources(Model m, Resource r, Property p, Iterable<String> uris) {
+    r.removeAll(p);
+    uris.forEach(uri -> r.addProperty(p, m.getResource(uri)));
+  }
+
+  public static void setResource(Model m, Resource r, Property p, String uri) {
+    r.removeAll(p);
+    r.addProperty(p, m.getResource(uri));
   }
 }
