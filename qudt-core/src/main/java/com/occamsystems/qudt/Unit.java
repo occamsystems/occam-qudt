@@ -23,7 +23,7 @@ public abstract class Unit {
   }
 
   public boolean isConvertible(Unit other) {
-    return this == other || this.dv().equals(other.dv());
+    return this == other || this.dv().equivalent(other.dv());
   }
 
   /** This converts a raw value into a scaled value. For example, degF.scale(273.15) gives 32. */
@@ -37,10 +37,11 @@ public abstract class Unit {
   }
 
   public boolean equivalent(Unit other) {
-    return other != null
-        && this.dv().equals(other.dv())
+    return this == other
+        || (other != null
+        && this.isConvertible(other)
         && this.conversionMultiplier() == other.conversionMultiplier()
-        && this.conversionOffset() == other.conversionOffset();
+        && this.conversionOffset() == other.conversionOffset());
   }
 
   @Override

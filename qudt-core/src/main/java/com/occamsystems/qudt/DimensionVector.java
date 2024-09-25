@@ -209,6 +209,10 @@ public class DimensionVector {
     return Arrays.hashCode(vector);
   }
 
+  public boolean equivalent(DimensionVector other) {
+    return other != null && Arrays.equals(vector, other.vector);
+  }
+
   public static class Builder {
     private SmallFraction amountOfSubstance = SmallFraction.ZERO;
     private SmallFraction electricCurrent = SmallFraction.ZERO;

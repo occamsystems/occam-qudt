@@ -61,9 +61,8 @@ class UnitIndexTest {
     UnitIndex unitIndex = new UnitIndex();
     Assertions.assertEquals(L3Units.L.u, unitIndex.predefinedUnitBySymbol("L"));
     Assertions.assertEquals(L1Units.M.u, unitIndex.predefinedUnitBySymbol("m"));
-    Assertions.assertEquals(L1M1Units.KiloGM_M.u, unitIndex.predefinedUnitBySymbol("kg*m"));
-    Assertions.assertEquals(
-        L1M1T_2Units.KiloGM_M_PER_SEC2.u, unitIndex.predefinedUnitBySymbol("kg*m/s2"));
+    Assertions.assertEquals(L1M1Units.GM_MilliM.u, unitIndex.predefinedUnitBySymbol("g*mm"));
+    Assertions.assertEquals(L1M1T_2Units.J_PER_M.u, unitIndex.predefinedUnitBySymbol("J/m"));
   }
 
   @Test
@@ -71,9 +70,9 @@ class UnitIndexTest {
     UnitIndex unitIndex = new UnitIndex();
     Assertions.assertTrue(L3Units.L.u.equivalent(unitIndex.parseAsAggregateUnit("L")));
     Assertions.assertTrue(L1Units.M.u.equivalent(unitIndex.parseAsAggregateUnit("m")));
-    Assertions.assertTrue(L1M1Units.KiloGM_M.u.equivalent(unitIndex.parseAsAggregateUnit("kg*m")));
+    Assertions.assertTrue(L1M1Units.GM_MilliM.u.equivalent(unitIndex.parseAsAggregateUnit("g*mm")));
     AggregateUnit kgms_2 = unitIndex.parseAsAggregateUnit("kg*m/s2");
-    Assertions.assertTrue(L1M1T_2Units.KiloGM_M_PER_SEC2.u.equivalent(kgms_2));
+    Assertions.assertTrue(L1M1T_2Units.J_PER_M.u.equivalent(kgms_2));
     String symbol = kgms_2.symbol();
     Assertions.assertTrue(symbol.contains("s⁻²"));
     Assertions.assertTrue(symbol.contains("kg"));
