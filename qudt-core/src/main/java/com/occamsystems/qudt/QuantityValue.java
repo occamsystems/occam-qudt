@@ -349,6 +349,14 @@ public class QuantityValue implements Comparable<QuantityValue> {
         qv1.unscaled * qv2.unscaled, new AggregateUnit(qv1.unit, 1, qv2.unit, 1));
   }
 
+  public static double compareRatio(QuantityValue qv1, QuantityValue qv2) {
+    return QuantityValue.equivalentRatio(qv1, qv2) ? 0 : qv1.compareTo(qv2);
+  }
+
+  public static double compareAbsolute(QuantityValue qv1, QuantityValue qv2) {
+    return QuantityValue.equivalentAbsolute(qv1, qv2) ? 0 : qv1.compareTo(qv2);
+  }
+
   @Override
   public String toString() {
     return "%s %s".formatted(value(), unit);
