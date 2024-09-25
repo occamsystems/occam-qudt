@@ -39,9 +39,9 @@ public abstract class Unit {
   public boolean equivalent(Unit other) {
     return this == other
         || (other != null
-        && this.isConvertible(other)
-        && this.conversionMultiplier() == other.conversionMultiplier()
-        && this.conversionOffset() == other.conversionOffset());
+            && this.isConvertible(other)
+            && this.conversionMultiplier() == other.conversionMultiplier()
+            && this.conversionOffset() == other.conversionOffset());
   }
 
   @Override

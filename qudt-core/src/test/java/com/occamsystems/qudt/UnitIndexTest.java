@@ -117,6 +117,9 @@ class UnitIndexTest {
     QuantityValue withComma = unitIndex.parseQuantity("7,500 g");
     Assertions.assertEquals(7500, withComma.value());
     Assertions.assertEquals(M1Units.GM.u, withComma.unit());
+
+    QuantityValue liters = unitIndex.parseQuantity("3 L");
+    Assertions.assertEquals(L3Units.L.u, liters.unit());
   }
 
   @Test
