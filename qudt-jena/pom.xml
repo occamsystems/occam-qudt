@@ -4,23 +4,26 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>occam-qudt</artifactId>
-    <groupId>com.occamsystems</groupId>
+    <groupId>io.github.occamsystems</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>qudt-jena</artifactId>
 
+  <name>Occam QUDT with Jena</name>
+  <description>Provides APIs for reading and writing QUDT RDF, using Jena.</description>
+
   <properties>
-    <maven.compiler.source>19</maven.compiler.source>
-    <maven.compiler.target>19</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jena.version>5.1.0</jena.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>com.occamsystems</groupId>
+      <groupId>io.github.occamsystems</groupId>
       <artifactId>qudt-core</artifactId>
       <version>${project.version}</version>
     </dependency>
