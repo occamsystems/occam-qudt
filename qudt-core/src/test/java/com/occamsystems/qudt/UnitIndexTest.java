@@ -164,7 +164,8 @@ class UnitIndexTest {
     index.simpleUnits();
 
     now = Instant.now();
-    Assertions.assertDoesNotThrow(() -> {
+    Assertions.assertDoesNotThrow(
+        () -> {
           for (int i = 0; i < 8192; i++) {
             finals[i] = index.demandExactLiteral(rawAggs[i], "http://occamsystems.com/test#");
           }
