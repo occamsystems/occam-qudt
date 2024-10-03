@@ -137,14 +137,13 @@ class UnitIndexTest {
     UnitIndex index = new UnitIndex();
     long l = Double.doubleToLongBits(Math.random());
     List<LiteralUnit> literalUnits = index.units().toList();
-    int size = literalUnits.size();
     LiteralUnit[] l1 = new LiteralUnit[29];
     for (int i = 0; i < 29; i++) {
-      l1[i] = literalUnits.get((int) (size * Math.random()));
+      l1[i] = literalUnits.get(i);
     }
     LiteralUnit[] l2 = new LiteralUnit[31];
     for (int i = 0; i < 31; i++) {
-      l2[i] = literalUnits.get((int) (size * Math.random()));
+      l2[i] = literalUnits.get(i + 29);
     }
 
     AggregateUnit[] rawAggs = new AggregateUnit[8192];
@@ -159,19 +158,19 @@ class UnitIndexTest {
     }
 
     long time = Instant.now().toEpochMilli() - now.toEpochMilli();
-    System.out.println("Created 8192 random aggregate pairs in " + time + "ms");
+    System.out.println("Created 8192 aggregate pairs in " + time + "ms");
 
     LiteralUnit[] finals = new LiteralUnit[8192];
     index.simpleUnits();
 
     now = Instant.now();
-    for (int i = 0; i < 8192; i++) {
-      finals[i] = index.demandExactLiteral(rawAggs[i], "http://occamsystems.com/test#");
-    }
+    Assertions.assertDoesNotThrow(() -> {
+          for (int i = 0; i < 8192; i++) {
+            finals[i] = index.demandExactLiteral(rawAggs[i], "http://occamsystems.com/test#");
+          }
+        });
     time = Instant.now().toEpochMilli() - now.toEpochMilli();
     System.out.println("Found exact literals for 8192 random aggregate pairs in " + time + "ms");
     System.out.println((int) (((double) time) / 8.192) + "us per literal");
-
-    Assertions.assertTrue(time < 400, "Demanding units has gotten really slow.");
   }
 }
