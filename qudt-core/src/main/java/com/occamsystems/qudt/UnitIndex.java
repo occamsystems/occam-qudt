@@ -278,8 +278,8 @@ public class UnitIndex {
     return candidates
         .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
         .sorted(
-            Comparator.comparing(u -> symbolicDifference(base, (Unit) u))
-                .thenComparing(u -> ((Unit) u).symbol().length())
+            Comparator.comparing(u -> ((Unit) u).symbol().length())
+                .thenComparing(u -> symbolicDifference(base, (Unit) u))
                 .thenComparing(u -> ((Unit) u).symbol()))
         .findFirst();
   }

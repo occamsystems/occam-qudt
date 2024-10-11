@@ -4,6 +4,7 @@ import com.occamsystems.qudt.predefined.units.A1Units;
 import com.occamsystems.qudt.predefined.units.H1Units;
 import com.occamsystems.qudt.predefined.units.L1M1T_2Units;
 import com.occamsystems.qudt.predefined.units.L1M1Units;
+import com.occamsystems.qudt.predefined.units.L1T_1Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.L5Units;
@@ -130,6 +131,14 @@ class UnitIndexTest {
     Assertions.assertEquals("m¹⁰", litM10.symbol());
     LiteralUnit m10 = index.demandExactLiteral("m10", "http://occamsystems.com/test#");
     Assertions.assertEquals(m10, litM10);
+  }
+
+  @Test
+  void findSeconds() {
+    UnitIndex index = new UnitIndex();
+    AggregateUnit aggregateUnit = new AggregateUnit(L1Units.M.u, 1, L1T_1Units.M_PER_SEC.u, -1);
+    LiteralUnit literalUnit = index.demandExactLiteral(aggregateUnit, "http://occamsytems.com/test#");
+    Assertions.assertEquals(T1Units.SEC.u, literalUnit);
   }
 
   @Test
