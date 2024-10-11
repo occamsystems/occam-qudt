@@ -137,7 +137,8 @@ class UnitIndexTest {
   void findSeconds() {
     UnitIndex index = new UnitIndex();
     AggregateUnit aggregateUnit = new AggregateUnit(L1Units.M.u, 1, L1T_1Units.M_PER_SEC.u, -1);
-    LiteralUnit literalUnit = index.demandExactLiteral(aggregateUnit, "http://occamsytems.com/test#");
+    LiteralUnit literalUnit =
+        index.demandExactLiteral(aggregateUnit, "http://occamsytems.com/test#");
     Assertions.assertEquals(T1Units.SEC.u, literalUnit);
   }
 
