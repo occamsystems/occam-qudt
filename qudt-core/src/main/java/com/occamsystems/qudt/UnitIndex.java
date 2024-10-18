@@ -256,17 +256,25 @@ public class UnitIndex {
       return Optional.of(lu);
     }
 
-    if (this.preferredUnits.containsKey(base.dv())) {
-      Optional<LiteralUnit> preferredMatch =
-          exactMatch(base, this.preferredUnits.get(base.dv()).stream());
-      if (preferredMatch.isPresent()) {
-        return preferredMatch;
-      }
-    }
+    // TODO: Not sure why this picks up degC to K. But I believe this should be done after finding candidates
+//    if (this.preferredUnits.containsKey(base.dv())) {
+//      Optional<LiteralUnit> preferredMatch =
+//          exactMatch(base, this.preferredUnits.get(base.dv()).stream());
+//      if (preferredMatch.isPresent()) {
+//        return preferredMatch;
+//      }
+//    }
 
     LiteralUnit[] matches = Units.byDV.getOrDefault(base.dv().indexCode(), new LiteralUnit[] {});
     Collection<LiteralUnit> runtimeMatches =
         this.runtimeUnits.getOrDefault(base.dv().indexCode(), Collections.emptyList());
+
+    // Check if there are any direct matches
+    for (LiteralUnit unit : matches) {
+      if (unit.symbol().equals(base.symbol())) {
+        return Optional.of(unit);
+      }
+    }
 
     return exactMatch(base, Stream.concat(Arrays.stream(matches), runtimeMatches.stream()));
   }
@@ -275,6 +283,7 @@ public class UnitIndex {
     double cm = base.conversionMultiplier();
     double co = base.conversionOffset();
 
+    // TODO: degC conversionOffset is 0 as base, but is 274.15 for real unit
     return candidates
         .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
         .sorted(
