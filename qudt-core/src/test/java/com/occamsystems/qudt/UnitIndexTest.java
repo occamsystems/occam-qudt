@@ -184,4 +184,12 @@ class UnitIndexTest {
     System.out.println("Found exact literals for 8192 random aggregate pairs in " + time + "ms");
     System.out.println((int) (((double) time) / 8.192) + "us per literal");
   }
+
+  @Test
+  void degCParse() {
+    UnitIndex index = new UnitIndex();
+    QuantityValue quantityValue = index.parseQuantity("10 °C");
+    Assertions.assertEquals(10, quantityValue.value());
+    Assertions.assertEquals(H1Units.DEG_C.u, quantityValue.unit());
+  }
 }

@@ -256,6 +256,10 @@ public class UnitIndex {
       return Optional.of(lu);
     }
 
+    if (base instanceof AggregateUnit agg && agg.trivial()) {
+      return Optional.of(agg.trivialToLiteral());
+    }
+
     if (this.preferredUnits.containsKey(base.dv())) {
       Optional<LiteralUnit> preferredMatch =
           exactMatch(base, this.preferredUnits.get(base.dv()).stream());

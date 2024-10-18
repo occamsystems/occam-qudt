@@ -95,7 +95,7 @@ public class DimensionVector {
         return false;
       }
     }
-    return false;
+    return foundOne;
   }
 
   public DimensionVector scaledBy(SmallFraction value) {

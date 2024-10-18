@@ -129,7 +129,7 @@ public class AggregateUnit extends Unit {
   public double conversionOffset() {
     if (this.dv().unary()) {
       return this.components.keySet().stream()
-          .mapToDouble(LiteralUnit::conversionMultiplier)
+          .mapToDouble(LiteralUnit::conversionOffset)
           .findAny()
           .orElse(0.);
     }
@@ -156,5 +156,17 @@ public class AggregateUnit extends Unit {
             })
         .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
         .toString();
+  }
+
+  public boolean trivial() {
+    return this.components.size() == 1 && this.components.values().iterator().next().isOne();
+  }
+
+  public LiteralUnit trivialToLiteral() {
+    if (this.trivial()) {
+      return this.components.keySet().iterator().next();
+    }
+
+    return null;
   }
 }
