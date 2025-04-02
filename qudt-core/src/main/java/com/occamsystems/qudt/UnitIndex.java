@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -30,9 +31,9 @@ public class UnitIndex {
   public static final Logger log = Logger.getLogger(UnitIndex.class.getName());
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
-  private Map<String, List<LiteralUnit>> symbolMap = new HashMap<>();
+  private final Map<String, List<LiteralUnit>> symbolMap = new ConcurrentHashMap<>();
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
-  private Map<String, Collection<LiteralUnit>> runtimeUnits = new HashMap<>();
+  private final Map<String, Collection<LiteralUnit>> runtimeUnits = new ConcurrentHashMap<>();
 
   private static final String SIMPLE_NUMBER_REGEX = "[-+]?[\\d,]*(\\.\\d+)?";
   private static final String NUMBER_REGEX = SIMPLE_NUMBER_REGEX + "([eE][-+]?\\d+)?";
@@ -44,7 +45,7 @@ public class UnitIndex {
 
   private static final Pattern QTY_PATTERN = Pattern.compile(QTY_REGEX);
 
-  private final Map<DimensionVector, List<LiteralUnit>> preferredUnits = new HashMap<>(3);
+  private final Map<DimensionVector, List<LiteralUnit>> preferredUnits = new ConcurrentHashMap<>(3);
 
   /**
    * Creates a new unit index.
