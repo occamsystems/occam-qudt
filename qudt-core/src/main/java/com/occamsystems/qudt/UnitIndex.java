@@ -11,11 +11,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -31,7 +32,7 @@ public class UnitIndex {
   public static final Logger log = Logger.getLogger(UnitIndex.class.getName());
   private List<LiteralUnit> simpleUnits = null;
   private Map<String, LiteralUnit> simpleSymbolMap = null;
-  private final Map<String, List<LiteralUnit>> symbolMap = new ConcurrentHashMap<>();
+  private final Map<String, Queue<LiteralUnit>> symbolMap = new ConcurrentHashMap<>();
   private Map<DimensionVector, List<QuantityKind>> qkByDv;
   private final Map<String, Collection<LiteralUnit>> runtimeUnits = new ConcurrentHashMap<>();
 
@@ -172,7 +173,7 @@ public class UnitIndex {
   }
 
   /**
-   * Demands a LiteralUnit whose definition exactly matches the provided unit, follwing the logic
+   * Demands a LiteralUnit whose definition exactly matches the provided unit, following the logic
    * for exactMatch. If no such LiteralUnit exists, one will be created from the Aggregate returned
    * by exactMatch.
    */
@@ -203,7 +204,7 @@ public class UnitIndex {
   }
 
   /**
-   * Demands a LiteralUnit whose definition exactly matches the provided symbol, follwing the logic
+   * Demands a LiteralUnit whose definition exactly matches the provided symbol, following the logic
    * for exactMatch. If no such LiteralUnit exists, one will be created from the Aggregate returned
    * by exactMatch.
    */
@@ -233,16 +234,18 @@ public class UnitIndex {
    */
   public Unit exactMatch(String symbol) {
     String keys = toKeyboardChars(symbol);
+
     if (this.symbolMap.containsKey(keys)) {
-      return this.symbolMap.get(keys).iterator().next();
+      return this.symbolMap.get(keys).peek();
     }
 
     AggregateUnit aggregateUnit = parseAsAggregateUnit(symbol);
     Optional<LiteralUnit> literalUnit = exactMatch(aggregateUnit);
 
     if (literalUnit.isPresent()) {
-      this.symbolMap.computeIfAbsent(keys, k -> new ArrayList<>(1)).add(literalUnit.get());
-      return literalUnit.get();
+      LiteralUnit lu = literalUnit.get();
+      this.registerUnit(lu);
+      return lu;
     } else {
       return aggregateUnit;
     }
@@ -282,11 +285,10 @@ public class UnitIndex {
 
     return candidates
         .filter(u -> cm == u.conversionMultiplier() && co == u.conversionOffset())
-        .sorted(
+        .min(
             Comparator.comparing(u -> ((Unit) u).symbol().length())
                 .thenComparing(u -> symbolicDifference(base, (Unit) u))
-                .thenComparing(u -> ((Unit) u).symbol()))
-        .findFirst();
+                .thenComparing(u -> ((Unit) u).symbol()));
   }
 
   private int symbolicDifference(Unit base, Unit other) {
@@ -343,11 +345,10 @@ public class UnitIndex {
 
     double baseConvLog = Math.log(base.conversionMultiplier());
     return Stream.concat(Arrays.stream(matches), runtimeMatches.stream())
-        .sorted(
+        .min(
             Comparator.comparing(
                     u -> Math.abs(Math.log(((Unit) u).conversionMultiplier()) - baseConvLog))
                 .thenComparing(u -> ((Unit) u).symbol().length()))
-        .findFirst()
         .orElse(null);
   }
 
@@ -407,8 +408,7 @@ public class UnitIndex {
   public LiteralUnit predefinedUnitBySymbol(String symbol) {
     return this.units()
         .filter(u -> u.symbol().equals(symbol) || toKeyboardChars(u.symbol()).equals(symbol))
-        .sorted(this::preferredUnit)
-        .findFirst()
+        .min(this::preferredUnit)
         .orElse(null);
   }
 
@@ -517,11 +517,21 @@ public class UnitIndex {
   }
 
   public void registerUnit(LiteralUnit unit) {
-    Collection<LiteralUnit> list =
-        this.runtimeUnits.computeIfAbsent(unit.dv().indexCode(), k -> new HashSet<>());
-    list.add(unit);
+    this.runtimeUnits.computeIfAbsent(
+        unit.dv().indexCode(),
+        k -> {
+          ConcurrentLinkedQueue<LiteralUnit> q = new ConcurrentLinkedQueue<>();
+          q.add(unit);
+          return q;
+        });
     String sym = toKeyboardChars(unit.symbol());
-    this.symbolMap.computeIfAbsent(sym, k -> new ArrayList<>(1)).add(unit);
+    this.symbolMap.computeIfAbsent(
+        sym,
+        k -> {
+          ConcurrentLinkedQueue<LiteralUnit> q = new ConcurrentLinkedQueue<>();
+          q.add(unit);
+          return q;
+        });
   }
 
   public Optional<LiteralUnit> unitByUri(String uri) {
