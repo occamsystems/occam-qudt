@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class UnitIndex {
 
   public static final Predicate<String> TEST_COMPOSITE =
@@ -454,20 +455,54 @@ public class UnitIndex {
 
   public AggregateUnit parseAsAggregateUnit(String symbol) {
     String s = toKeyboardChars(symbol);
+    return this.parseUnitRecursive(s, new AtomicInteger(0));
+  }
+
+  private AggregateUnit parseUnitRecursive(String s, AtomicInteger i) {
     boolean negative = false;
     char[] chars = s.toCharArray();
     StringBuilder b = new StringBuilder();
     AggregateUnit aggregateUnit = AggregateUnit.empty;
-    for (int i = 0; i < chars.length; i++) {
-      if (chars[i] == '/' || chars[i] == '*') {
+    for (int j = i.get(); i.get() < chars.length; j = i.incrementAndGet()) {
+      if (chars[j] == '(') {
+        i.incrementAndGet();
+        AggregateUnit subUnit = parseUnitRecursive(s, i);
+        double exp = 1;
+
+        if (i.get() < chars.length) {
+          StringBuilder subB = new StringBuilder();
+          for (int jj = i.incrementAndGet();
+              i.get() < chars.length && "0123456789+-".contains("" + chars[jj]);
+              jj = i.incrementAndGet()) {
+            subB.append(chars[jj]);
+          }
+          if (i.get() < chars.length) {
+            i.decrementAndGet();
+          }
+          if (!subB.isEmpty()) {
+            exp = Double.parseDouble(subB.toString());
+          }
+        }
+
+        if (negative) {
+          exp *= -1;
+        }
+
+        aggregateUnit =
+            new AggregateUnit(
+                aggregateUnit, SmallFraction.ONE, subUnit, SmallFraction.approximate(exp));
+      } else if (chars[j] == ')') {
+        aggregateUnit = parseUnitExponent(negative, b, aggregateUnit);
+        break;
+      } else if (chars[j] == '/' || chars[j] == '*') {
         aggregateUnit = parseUnitExponent(negative, b, aggregateUnit);
 
         b = new StringBuilder();
-        negative = chars[i] == '/';
+        negative = chars[j] == '/';
       } else {
-        b.append(chars[i]);
+        b.append(chars[j]);
 
-        if (i == chars.length - 1) {
+        if (j == chars.length - 1) {
           aggregateUnit = parseUnitExponent(negative, b, aggregateUnit);
         }
       }

@@ -3,7 +3,7 @@ package com.occamsystems.qudt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 class SmallFractionTest {
   @Test
   void create() {

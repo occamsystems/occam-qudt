@@ -4,7 +4,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class GeneratorUtils {
 
   public static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";

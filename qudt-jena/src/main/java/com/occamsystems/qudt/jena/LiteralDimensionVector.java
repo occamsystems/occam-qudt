@@ -3,7 +3,7 @@ package com.occamsystems.qudt.jena;
 import com.occamsystems.qudt.DimensionVector;
 import com.occamsystems.qudt.SmallFraction;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class LiteralDimensionVector extends DimensionVector {
 
   private String uri;

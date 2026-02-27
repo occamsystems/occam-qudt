@@ -3,7 +3,7 @@ package com.occamsystems.qudt;
 import com.occamsystems.qudt.predefined.units.D1Units;
 import java.util.Objects;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class QuantityValue implements Comparable<QuantityValue> {
 
   private static double EPSILON = 0.00001;

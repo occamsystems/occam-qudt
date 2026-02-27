@@ -6,7 +6,7 @@ import com.occamsystems.qudt.predefined.units.D1Units;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 class UnitTest {
   @Test
   void numbers() {

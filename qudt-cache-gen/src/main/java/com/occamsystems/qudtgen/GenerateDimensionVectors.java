@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Statement;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class GenerateDimensionVectors {
   public static final String VECTOR_VOCAB = "https://qudt.org/2.1/vocab/dimensionvector";
   public static final String DEFINED_BY = "http://www.w3.org/2000/01/rdf-schema#isDefinedBy";

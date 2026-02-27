@@ -21,7 +21,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Statement;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class GenerateUnits {
   public static final String UNIT_VOCAB = "https://qudt.org/2.1/vocab/unit";
   private static final String CONV_M = "http://qudt.org/schema/qudt/conversionMultiplier";

@@ -2,7 +2,7 @@ package com.occamsystems.qudt;
 
 import java.util.Arrays;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class DimensionVector {
 
   public static final DimensionVector DIMENSIONLESS = DimensionVector.builder().build();

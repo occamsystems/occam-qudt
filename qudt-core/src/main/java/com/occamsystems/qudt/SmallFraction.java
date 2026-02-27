@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
- * Copyright (c) 2024 Occam Systems, Inc.
+ * Copyright (c) 2024-2026 Occam Systems, Inc.
  *
  * <p>This class handles rational numbers with short numerator and denominator values. This is
  * intended to be used by dimension vectors, whose denominators are normally 1, sometimes 2, and may

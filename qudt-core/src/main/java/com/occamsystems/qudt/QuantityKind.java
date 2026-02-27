@@ -1,6 +1,6 @@
 package com.occamsystems.qudt;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 public class QuantityKind {
   String uri;
   String label;

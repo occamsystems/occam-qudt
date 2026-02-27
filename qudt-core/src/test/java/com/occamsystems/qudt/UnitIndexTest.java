@@ -5,9 +5,13 @@ import com.occamsystems.qudt.predefined.units.H1Units;
 import com.occamsystems.qudt.predefined.units.L1M1T_2Units;
 import com.occamsystems.qudt.predefined.units.L1M1Units;
 import com.occamsystems.qudt.predefined.units.L1T_1Units;
+import com.occamsystems.qudt.predefined.units.L1T_2Units;
 import com.occamsystems.qudt.predefined.units.L1Units;
+import com.occamsystems.qudt.predefined.units.L2T_2Units;
 import com.occamsystems.qudt.predefined.units.L3Units;
 import com.occamsystems.qudt.predefined.units.L5Units;
+import com.occamsystems.qudt.predefined.units.L6Units;
+import com.occamsystems.qudt.predefined.units.M1H_1T_3Units;
 import com.occamsystems.qudt.predefined.units.M1Units;
 import com.occamsystems.qudt.predefined.units.T1Units;
 import com.occamsystems.qudt.predefined.units.T_1Units;
@@ -17,7 +21,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Copyright (c) 2024 Occam Systems, Inc. */
+/** Copyright (c) 2024-2026 Occam Systems, Inc. */
 class UnitIndexTest {
 
   @Test
@@ -191,5 +195,18 @@ class UnitIndexTest {
     QuantityValue quantityValue = index.parseQuantity("10 °C");
     Assertions.assertEquals(10, quantityValue.value());
     Assertions.assertEquals(H1Units.DEG_C.u, quantityValue.unit());
+  }
+
+  @Test
+  void parentheticalUnits() {
+    UnitIndex index = new UnitIndex();
+    AggregateUnit aggregateUnit = index.parseAsAggregateUnit("W/(m²·K)");
+    Assertions.assertTrue(M1H_1T_3Units.W_PER_M2_K.u.equivalent(aggregateUnit));
+    AggregateUnit aggregateUnit2 = index.parseAsAggregateUnit("(m2)3");
+    Assertions.assertTrue(L6Units.M6.u.equivalent(aggregateUnit2));
+    AggregateUnit aggregateUnit3 = index.parseAsAggregateUnit("(m/s)2");
+    Assertions.assertTrue(L2T_2Units.M2_PER_SEC2.u.equivalent(aggregateUnit3));
+    AggregateUnit aggregateUnit4 = index.parseAsAggregateUnit("(m/s)2/m");
+    Assertions.assertTrue(L1T_2Units.M_PER_SEC2.u.equivalent(aggregateUnit4));
   }
 }
