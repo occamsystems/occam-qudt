@@ -400,6 +400,10 @@ public class UnitIndex {
         .toString();
   }
 
+  public static String sansDegree(String symbol) {
+    return symbol.replace("°C", "C").replace("°F", "F");
+  }
+
   public Stream<LiteralUnit> units() {
     return Stream.concat(
         Units.byDV.values().stream().flatMap(Arrays::stream),
@@ -549,6 +553,68 @@ public class UnitIndex {
     }
 
     return null;
+  }
+
+  /**
+   * Parses a quantity from among the specified kinds. Kinds can be named (e.g. Temperature) or
+   * identified by index code (e.g. H1). If no matching unit is found, the value will be returned
+   * unitless.
+   * @param qtyString The quantity string.
+   * @param kinds The allowed kinds, by name and/or index code.
+   * @return The parsed quantity, unitless if no matching unit is found.
+   */
+  public QuantityValue parseQuantityOfKind(String qtyString, String... kinds) {
+    Matcher matcher = QTY_PATTERN.matcher(qtyString);
+    if (matcher.find()) {
+      String valueString = matcher.group("value");
+      String unitString = matcher.group("unit");
+      Unit unit;
+      if (unitString.isBlank()) {
+        unit = D1Units.UNITLESS.u;
+      } else {
+        unit = parseUnitOfKind(unitString, kinds);
+      }
+      return QuantityValue.ofScaled(
+          Double.parseDouble(String.join("", valueString.split(","))), unit);
+    }
+
+    return null;
+  }
+
+
+  /**
+   * Parses a unit from among the specified kinds. Kinds can be named (e.g. Temperature) or
+   * identified by index code (e.g. H1). If no matching unit is found, UNITLESS will be returned.
+   * @param unitString The unit symbol.
+   * @param kinds The allowed kinds, by name and/or index code.
+   * @return The parsed unit, or UNITLESS if no matching unit is found.
+   */
+  public Unit parseUnitOfKind(String unitString, String... kinds) {
+    Unit unit;
+    Optional<LiteralUnit> match =
+        Arrays.stream(QuantityKinds.values())
+            .map(qke -> qke.qk)
+            .filter(
+                qk -> {
+                  for (int i = 0; i < kinds.length; i++) {
+                    if (qk.dimensionVector.indexCode().equalsIgnoreCase(kinds[i])
+                        || qk.label().equalsIgnoreCase(kinds[i])) {
+                      return true;
+                    }
+                  }
+                  return false;
+                })
+            .map(qk -> Units.byDV.get(qk.dimensionVector.indexCode()))
+            .distinct()
+            .flatMap(Arrays::stream)
+            .filter(
+                u ->
+                    unitString.equalsIgnoreCase(u.symbol())
+                        || unitString.equalsIgnoreCase(toKeyboardChars(u.symbol()))
+                        || unitString.equalsIgnoreCase(sansDegree(u.symbol())))
+            .findAny();
+    unit = match.orElse(D1Units.UNITLESS.u);
+    return unit;
   }
 
   public void registerUnit(LiteralUnit unit) {

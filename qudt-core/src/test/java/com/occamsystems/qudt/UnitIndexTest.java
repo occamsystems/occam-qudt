@@ -209,4 +209,20 @@ class UnitIndexTest {
     AggregateUnit aggregateUnit4 = index.parseAsAggregateUnit("(m/s)2/m");
     Assertions.assertTrue(L1T_2Units.M_PER_SEC2.u.equivalent(aggregateUnit4));
   }
+
+  @Test
+  void parseUnitOfKind() {
+    UnitIndex index = new UnitIndex();
+    Unit unit = index.exactMatch("C");
+    Assertions.assertNotEquals(H1Units.DEG_C.u, unit);
+    unit = index.exactMatch("degC");
+    Assertions.assertEquals(H1Units.DEG_C.u, unit);
+
+    unit = index.parseUnitOfKind("C", "H1");
+    Assertions.assertEquals(H1Units.DEG_C.u, unit);
+    unit = index.parseUnitOfKind("C", "Temperature");
+    Assertions.assertEquals(H1Units.DEG_C.u, unit);
+    unit = index.parseUnitOfKind("C", "temperature");
+    Assertions.assertEquals(H1Units.DEG_C.u, unit);
+  }
 }
