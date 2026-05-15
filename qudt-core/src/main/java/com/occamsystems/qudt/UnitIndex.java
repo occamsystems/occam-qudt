@@ -559,6 +559,7 @@ public class UnitIndex {
    * Parses a quantity from among the specified kinds. Kinds can be named (e.g. Temperature) or
    * identified by index code (e.g. H1). If no matching unit is found, the value will be returned
    * unitless.
+   *
    * @param qtyString The quantity string.
    * @param kinds The allowed kinds, by name and/or index code.
    * @return The parsed quantity, unitless if no matching unit is found.
@@ -581,10 +582,10 @@ public class UnitIndex {
     return null;
   }
 
-
   /**
    * Parses a unit from among the specified kinds. Kinds can be named (e.g. Temperature) or
    * identified by index code (e.g. H1). If no matching unit is found, UNITLESS will be returned.
+   *
    * @param unitString The unit symbol.
    * @param kinds The allowed kinds, by name and/or index code.
    * @return The parsed unit, or UNITLESS if no matching unit is found.
